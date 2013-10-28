@@ -11,4 +11,7 @@
                  [org.clojure/tools.cli "0.2.2"]
                  [digest "1.4.3"]
                  [clj-time "0.5.1"]
-                 [metrics-clojure "0.7.0" :exclusions [org.clojure/clojure org.slf4j/slf4j-api]]])
+                 [metrics-clojure "0.7.0" :exclusions [org.clojure/clojure org.slf4j/slf4j-api]]]
+
+  :deploy-repositories [["releases" "http://nexus.delivery.puppetlabs.net/content/repositories/releases/"]
+                        ["snapshots" "http://nexus.delivery.puppetlabs.net/content/repositories/snapshots/"]])
