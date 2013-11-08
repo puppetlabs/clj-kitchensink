@@ -1,13 +1,10 @@
-# clj-utils
+# puppetlabs/kitchensink
 
-A Clojure library designed to ... well, that part is up to you.
-
-## Usage
-
-FIXME
+A library of utility functions that are common to several Puppet Labs
+clojure projects.
 
 ## License
 
-Copyright © 2013 FIXME
+Copyright © 2013 Puppet Labs
 
 Distributed under the Eclipse Public License, the same as Clojure.
