@@ -239,7 +239,7 @@
     (let [fail-status (atom {})]
       (with-redefs [fail-with-missing-cli-arg! (fn [missing-field _]
                                                  (reset! fail-status {:missing-field missing-field}))]
-        (cli! [] [["-r"]] [:required])
+        (cli! [] [["-r" "--required" "A required field"]] [:required])
         (is (= (@fail-status :missing-field) :required))))))
 
 
