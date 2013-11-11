@@ -1,4 +1,4 @@
-(ns com.puppetlabs.ssl
+(ns puppetlabs.utils.ssl
   (:import (java.security Key KeyPair PrivateKey PublicKey KeyStore Security)
            (java.security.cert X509Certificate)
            (org.bouncycastle.openssl PEMReader PEMWriter)

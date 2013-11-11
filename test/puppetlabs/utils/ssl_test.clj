@@ -1,8 +1,8 @@
-(ns com.puppetlabs.test.ssl
+(ns puppetlabs.utils.ssl-test
   (:import java.util.Arrays
            [java.security PrivateKey])
   (:use clojure.test
-        com.puppetlabs.ssl
+        puppetlabs.utils.ssl
         [clojure.java.io :only [resource reader]]))
 
 (deftest privkeys
