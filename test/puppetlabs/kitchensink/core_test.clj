@@ -1,8 +1,8 @@
-(ns puppetlabs.utils-test
+(ns puppetlabs.kitchensink.core_test
   (:require [fs.core :as fs]
             [clojure.string :as string])
-  (:use [puppetlabs.utils]
-        [puppetlabs.testutils]
+  (:use [puppetlabs.kitchensink.core]
+        [puppetlabs.kitchensink.testutils]
         [clojure.test]))
 
 (deftest array?-test

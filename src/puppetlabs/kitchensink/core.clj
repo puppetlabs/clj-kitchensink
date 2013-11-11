@@ -4,7 +4,7 @@
 ;; proper namespaces, or perhaps even separate libraries
 ;; altogether. But who has time for that?
 
-(ns puppetlabs.utils
+(ns puppetlabs.kitchensink.core
   (:import [org.ini4j Ini]
            [javax.naming.ldap LdapName])
   (:require [clojure.test]

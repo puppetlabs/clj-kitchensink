@@ -1,4 +1,4 @@
-(ns puppetlabs.utils.classpath
+(ns puppetlabs.kitchensink.classpath
   (:import (java.net URLClassLoader URL))
   (:require [clojure.java.io :refer [file Coercions]]))
 
