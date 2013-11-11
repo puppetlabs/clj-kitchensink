@@ -234,6 +234,15 @@
                 {:foo {:bar "baz"}
                  :bar {:bar "goo"}})))))))
 
+(deftest cli-parsing
+  (testing "Should call `fail-with-missing-cli-arg!` if a required option is missing"
+    (let [fail-status (atom {})]
+      (with-redefs [fail-with-missing-cli-arg! (fn [missing-field _]
+                                                 (reset! fail-status {:missing-field missing-field}))]
+        (cli! [] [["-r"]] [:required])
+        (is (= (@fail-status :missing-field) :required))))))
+
+
 (deftest cert-utils
   (testing "extracting cn from a dn"
     (is (thrown? AssertionError (cn-for-dn 123))
