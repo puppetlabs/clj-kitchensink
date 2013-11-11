@@ -1,4 +1,4 @@
-(ns puppetlabs.testutils)
+(ns puppetlabs.kitchensink.testutils)
 
 (defn call-counter
   "Returns a method that just tracks how many times it's called, and

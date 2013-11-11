@@ -1,14 +1,14 @@
-(ns puppetlabs.utils.ssl-test
+(ns puppetlabs.kitchensink.ssl-test
   (:import java.util.Arrays
            [java.security PrivateKey])
   (:use clojure.test
-        puppetlabs.utils.ssl
+        puppetlabs.kitchensink.ssl
         [clojure.java.io :only [resource reader]]))
 
 (deftest privkeys
   (testing "assoc-private-key-file!"
-    (let [private-key-file (resource "com/puppetlabs/test/ssl/private_keys/localhost.pem")
-          cert-file        (resource "com/puppetlabs/test/ssl/certs/localhost.pem")
+    (let [private-key-file (resource "puppetlabs/kitchensink/examples/ssl/private_keys/localhost.pem")
+          cert-file        (resource "puppetlabs/kitchensink/examples/ssl/certs/localhost.pem")
           keystore         (keystore)
           _                (assoc-private-key-file! keystore "mykey" private-key-file "bunkpassword" cert-file)
           keystore-key     (.getKey keystore "mykey" (char-array "bunkpassword"))
@@ -27,5 +27,5 @@
 
 (deftest rsakeyonly
   (testing "reading PEM files with only the RSA-key should work"
-    (let [privkey (resource "com/puppetlabs/test/ssl/private_keys/keyonly.pem")]
+    (let [privkey (resource "puppetlabs/kitchensink/examples/ssl/private_keys/keyonly.pem")]
       (is (instance? PrivateKey (pem->private-key privkey))))))
