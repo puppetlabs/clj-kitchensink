@@ -449,6 +449,20 @@
 
 ;; ## Command-line parsing
 
+(defn fail-with-missing-cli-arg!
+  "Helper function that prints a failure message when a required CLI arg
+  is missing, prints a usage message, and then exits.
+
+  We mostly have this separated into its own function in order to make it possible
+  to write tests against the rest of the logic without worrying about the
+  System/exit call in here."
+  [missing-field banner]
+  (println)
+  (println (format "Missing required argument '--%s'!" (name missing-field)))
+  (println)
+  (println banner)
+  (System/exit 1))
+
 (defn cli!
   "Validates that required command-line arguments are present.  If they are not,
   exits with an error and displays usage information.  Input:
@@ -471,11 +485,7 @@
       (println banner)
       (System/exit 0))
     (when-let [missing-field (some #(if (not (contains? options %)) %) required-args)]
-      (println)
-      (println (format "Missing required argument '--%s'!" (name missing-field)))
-      (println)
-      (println banner)
-      (System/exit 1))
+      (fail-with-missing-cli-arg! missing-field banner))
     [options extras]))
 
 
