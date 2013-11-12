@@ -50,6 +50,17 @@
   (testing "should return false for an invalid integer")
   (is (not (datetime? -9999999999999999999999999999999))))
 
+(deftest test-true-str?
+  (are [t-or-f? str-val] (t-or-f? (true-str? str-val))
+
+                         true? "true"
+                         true? "TRUE"
+                         true? "TrUe"
+
+                         false? "false"
+                         false? nil
+                         false? "FALSE"))
+
 (deftest quotient-test
   (testing "quotient"
 
