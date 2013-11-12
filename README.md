@@ -7,4 +7,4 @@ clojure projects.
 
 Copyright © 2013 Puppet Labs
 
-Distributed under the Eclipse Public License, the same as Clojure.
+Distributed under the [Apache License, version 2](http://www.apache.org/licenses/).
