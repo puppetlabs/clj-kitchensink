@@ -13,10 +13,8 @@
                  [digest "1.4.3"]
                  [clj-time "0.5.1"]
                  ;; SSL
-                 [org.bouncycastle/bcpkix-jdk15on "1.49"]
-                 [metrics-clojure "0.7.0" :exclusions [org.clojure/clojure org.slf4j/slf4j-api]]]
+                 [org.bouncycastle/bcpkix-jdk15on "1.49"]]
 
   :profiles {:dev {:resource-paths ["test-resources"]}}
 
-  :deploy-repositories [["releases" "http://nexus.delivery.puppetlabs.net/content/repositories/releases/"]
-                        ["snapshots" "http://nexus.delivery.puppetlabs.net/content/repositories/snapshots/"]])
+  :deploy-repositories [["snapshots" "http://nexus.delivery.puppetlabs.net/content/repositories/snapshots/"]])
