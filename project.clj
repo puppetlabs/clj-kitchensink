@@ -12,6 +12,7 @@
                  [org.clojure/tools.cli "0.2.2"]
                  [digest "1.4.3"]
                  [clj-time "0.5.1"]
+                 [slingshot "0.10.3"]
                  ;; SSL
                  [org.bouncycastle/bcpkix-jdk15on "1.49"]
                  [metrics-clojure "0.7.0" :exclusions [org.clojure/clojure org.slf4j/slf4j-api]]]

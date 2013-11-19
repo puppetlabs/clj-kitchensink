@@ -1,5 +1,6 @@
 (ns puppetlabs.kitchensink.core_test
   (:require [fs.core :as fs]
+            [slingshot.slingshot :refer [try+]]
             [clojure.string :as string])
   (:use [puppetlabs.kitchensink.core]
         [puppetlabs.kitchensink.testutils]
@@ -235,13 +236,13 @@
                  :bar {:bar "goo"}})))))))
 
 (deftest cli-parsing
-  (testing "Should call `fail-with-missing-cli-arg!` if a required option is missing"
-    (let [fail-status (atom {})]
-      (with-redefs [fail-with-missing-cli-arg! (fn [missing-field _]
-                                                 (reset! fail-status {:missing-field missing-field}))]
+  (testing "Should throw an error if a required option is missing"
+    (let [got-expected-error (atom false)]
+      (try+
         (cli! [] [["-r" "--required" "A required field"]] [:required])
-        (is (= (@fail-status :missing-field) :required))))))
-
+        (catch string? msg
+          (reset! got-expected-error true)))
+      (is @got-expected-error))))
 
 (deftest cert-utils
   (testing "extracting cn from a dn"
