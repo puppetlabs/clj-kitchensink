@@ -2,6 +2,10 @@
   :description "Clojure utility functions"
   :license {:name "Apache License, Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
+  ;; Abort when version ranges or version conflicts are detected in
+  ;; dependencies. Also supports :warn to simply emit warnings.
+  ;; requires lein 2.2.0+.
+  :pedantic? :abort
   :dependencies [[org.clojure/clojure "1.5.1"]
                  ;; Logging
                  [org.clojure/tools.logging "0.2.6"]
