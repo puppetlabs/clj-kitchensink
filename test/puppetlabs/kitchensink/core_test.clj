@@ -251,7 +251,8 @@
     (let [got-expected-error (atom false)]
       (try+
         (cli! [] [["-r" "--required" "A required field"]] [:required])
-        (catch string? msg
+        (catch map? m
+          (is (contains? m :error-message))
           (reset! got-expected-error true)))
       (is @got-expected-error))))
 

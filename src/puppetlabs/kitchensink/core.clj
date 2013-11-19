@@ -457,7 +457,16 @@
 
 (defn cli!
   "Validates that required command-line arguments are present.  If they are not,
-  exits with an error and displays usage information.  Input:
+  throws an exception** with an error message that is intended to be displayed
+  to a human being..
+
+  ** It's not actually an exception that is thrown.  This function uses the
+  'slingshot' library (https://github.com/scgilardi/slingshot) to throw a
+   map instead of an exception.  The map contains a key `:error-message`
+   that points to a nicely-formatted error message that should be displayed to
+   a user.
+
+  Input:
 
   - args     : the command line arguments passed in by the user
   - specs    : an array of supported argument specifications, as accepted by
@@ -481,7 +490,7 @@
                   (format "Missing required argument '--%s'!" (name missing-field))
                   "\n\n"
                   banner)]
-        (throw+ msg)
+        (throw+ {:error-message msg})
         [options extras]))))
 
 
