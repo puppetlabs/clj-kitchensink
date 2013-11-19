@@ -480,7 +480,7 @@
   the help and exits."
   [args specs required-args]
   (let [specs                   (conj specs
-                                  ["-h" "--help" "Show help" :default false :flag true])
+                                      ["-h" "--help" "Show help" :default false :flag true])
         [options extras banner] (apply cli/cli args specs)]
     (when (:help options)
       (throw+ banner))
@@ -490,8 +490,8 @@
                   (format "Missing required argument '--%s'!" (name missing-field))
                   "\n\n"
                   banner)]
-        (throw+ {:error-message msg})
-        [options extras]))))
+        (throw+ {:error-message msg})))
+    [options extras]))
 
 
 ;; ## SSL Certificate handling

@@ -254,7 +254,15 @@
         (catch map? m
           (is (contains? m :error-message))
           (reset! got-expected-error true)))
-      (is @got-expected-error))))
+      (is @got-expected-error)))
+
+  (testing "Should return a map after parsing CLI args"
+    (let [cli-data (first (cli! ["-a" "1234 Sunny ave." "-g" "Hey, what's up?"]
+                                [["-g" "--greeting" "A string to greet somebody"]
+                                 ["-a" "--address" "Somebody's address"]] []))]
+      (is (map? cli-data))
+      (is (contains? cli-data :address))
+      (is (contains? cli-data :greeting)))))
 
 (deftest cert-utils
   (testing "extracting cn from a dn"
