@@ -20,6 +20,7 @@ set -e
 if [ $TAG_EXISTS -eq 0 ]
 then
     echo "A tag called '$PROJECT_VERSION' already exists for this project; aborting."
+    exit 1
 fi
 
 echo "Project version is valid, tag doesn't yet exist.  Running tests."
@@ -27,7 +28,7 @@ lein test
 echo "Tests passed!"
 
 git tag $PROJECT_VERSION
-git push --tags
+git push origin $PROJECT_VERSION
 
 echo "Tagged version '$PROJECT_VERSION'"
 
