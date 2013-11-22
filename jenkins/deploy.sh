@@ -11,6 +11,8 @@ then
     exit 1
 fi
 
+git fetch --tags
+
 set +e
 git show-ref --tags --quiet --verify -- "refs/tags/$PROJECT_VERSION"
 TAG_EXISTS=$?
