@@ -6,7 +6,8 @@
 
 (ns puppetlabs.kitchensink.core
   (:import [org.ini4j Ini]
-           [javax.naming.ldap LdapName])
+           [javax.naming.ldap LdapName]
+           [java.io StringWriter])
   (:require [clojure.test]
             [clojure.tools.logging :as log]
             [clojure.string :as string]
@@ -18,6 +19,7 @@
         [clojure.set :only (difference union)]
         [clojure.string :only (split)]
         [clojure.stacktrace :only (print-cause-trace)]
+        [clojure.pprint :only [pprint]]
         [clj-time.core :only [now]]
         [clj-time.coerce :only [ICoerce to-date-time]]
         [clj-time.format :only [formatters unparse]]))
@@ -63,6 +65,11 @@
   "Return true if the string contains true"
   [^String s]
   (.equalsIgnoreCase "true" s))
+
+(defn pprint-to-string [x]
+  (let [w (StringWriter.)]
+    (pprint x w)
+    (.toString w)))
 
 ;; ## I/O
 
