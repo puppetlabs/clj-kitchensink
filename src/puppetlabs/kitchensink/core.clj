@@ -378,6 +378,27 @@
 
 ;; ## Configuration files
 
+(def keywordize
+  "Normalize INI keys by ensuring they're lower-case and keywords"
+  (comp keyword string/lower-case))
+
+(defn fetch-int
+  "Fetch a key from the INI section and convert it
+   to an integer if it parses, otherwise return the string"
+  [section key]
+  (let [val (.fetch section key)]
+    (or (parse-int val)
+        val)))
+
+(defn create-section-map
+  "Given an INI section, create a clojure map of it's key/values"
+  [section]
+  (reduce (fn [acc [key _]]
+            (assoc acc
+              (keywordize key)
+              (fetch-int section key)))
+          {} section))
+
 (defn ini-to-map
   "Takes a .ini filename and returns a nested map of
   fully-interpolated values. Strings that look like integers are
@@ -385,20 +406,16 @@
   symbols."
   [filename]
   {:pre  [(or (string? filename)
-            (instance? java.io.File filename))]
+              (instance? java.io.File filename))]
    :post [(map? %)
           (every? keyword? (keys %))
           (every? map? (vals %))]}
-  (let [ini        (Ini. (reader filename))
-        m          (atom {})
-        keywordize #(keyword (string/lower-case %))]
 
-    (doseq [[name section] ini
-            [key _] section
-            :let [val (.fetch section key)
-                  val (or (parse-int val) val)]]
-      (swap! m assoc-in [(keywordize name) (keywordize key)] val))
-    @m))
+  (reduce (fn [acc [name section]]
+            (assoc acc
+              (keywordize name)
+              (create-section-map section)))
+          {} (Ini. (reader filename))))
 
 (defn inis-to-map
   "Takes a path and converts the pointed-at .ini files into a nested
