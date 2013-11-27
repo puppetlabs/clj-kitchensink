@@ -5,7 +5,7 @@ clojure projects.
 
 ## Using Our Test Utils
 
-Kitchensink provides [utility code](./test/puppetlabs/kitchensink/testutils.clj) for use in tests.
+Kitchensink provides [utility code](./test/puppetlabs/kitchensink/) for use in tests.
 The code is available in a separate "test" jar that you may depend on by using a classifier in your project dependencies.
 
 ```clojure
