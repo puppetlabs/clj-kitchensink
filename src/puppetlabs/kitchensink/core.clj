@@ -480,15 +480,9 @@
 ;; ## Command-line parsing
 
 (defn cli!
-  "Validates that required command-line arguments are present.  If they are not,
-  throws an exception** with an error message that is intended to be displayed
-  to a human being..
-
-  ** It's not actually an exception that is thrown.  This function uses the
-  'slingshot' library (https://github.com/scgilardi/slingshot) to throw a
-   map instead of an exception.  The map contains a key `:error-message`
-   that points to a nicely-formatted error message that should be displayed to
-   a user.
+  "Validates that required command-line arguments are present. If they are not,
+  throws a map** with an error message that is intended to be displayed to the user.
+  Also checks to see whether the user has passed the `--help` flag.
 
   Input:
 
@@ -500,21 +494,24 @@
                `required` options are not present, the function will cause
                the program to exit and display the help message.
 
-  Also checks to see whether user has passed the `--help` flag, and if so, displays
-  the help and exits."
+  ** The map is thrown using 'slingshot' (https://github.com/scgilardi/slingshot).
+  It contains a `:type` and `:message`, where type is either `:error` or `:help`,
+  and the message is either the error message or a help banner."
   [args specs required-args]
   (let [specs                   (conj specs
                                       ["-h" "--help" "Show help" :default false :flag true])
         [options extras banner] (apply cli/cli args specs)]
     (when (:help options)
-      (throw+ banner))
+      (throw+ {:type :help
+               :message banner}))
     (when-let [missing-field (some #(if (not (contains? options %)) %) required-args)]
       (let [msg (str
                   "\n\n"
                   (format "Missing required argument '--%s'!" (name missing-field))
                   "\n\n"
                   banner)]
-        (throw+ {:error-message msg})))
+        (throw+ {:type :error
+                 :message msg})))
     [options extras]))
 
 

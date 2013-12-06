@@ -1,4 +1,4 @@
-(ns puppetlabs.kitchensink.core_test
+(ns puppetlabs.kitchensink.core-test
   (:require [fs.core :as fs]
             [slingshot.slingshot :refer [try+]]
             [clojure.string :as string])
@@ -252,9 +252,22 @@
       (try+
         (cli! [] [["-r" "--required" "A required field"]] [:required])
         (catch map? m
-          (is (contains? m :error-message))
+          (is (contains? m :type))
+          (is (= :error (:type m)))
+          (is (contains? m :message))
           (reset! got-expected-error true)))
-      (is @got-expected-error)))
+      (is (true? @got-expected-error))))
+
+  (testing "Should throw a help message if --help is provided"
+    (let [got-expected-help (atom false)]
+      (try+
+        (cli! ["--help"] [] [])
+        (catch map? m
+          (is (contains? m :type))
+          (is (= :help (:type m)))
+          (is (contains? m :message))
+          (reset! got-expected-help true)))
+      (is (true? @got-expected-help))))
 
   (testing "Should return a map after parsing CLI args"
     (let [cli-data (first (cli! ["-a" "1234 Sunny ave." "-g" "Hey, what's up?"]
