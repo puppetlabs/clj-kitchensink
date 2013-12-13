@@ -54,6 +54,13 @@
 
 ;; ## String utilities
 
+(defn parse-bool
+  "Parse a string and return its boolean value."
+  [s]
+  {:pre [(or (nil? s) (string? s))]
+   :post [(boolean? %)]}
+  (Boolean/parseBoolean s))
+
 (defn string-contains?
   "Returns true if `s` has the `substring` in it"
   [substring s]
