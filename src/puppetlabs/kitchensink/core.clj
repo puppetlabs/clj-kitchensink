@@ -354,6 +354,15 @@
 
 ;; ## Exception handling
 
+(defn without-ns
+  "Given a clojure keyword that is optionally namespaced, returns
+  a keyword with the same name but with no namespace."
+  [kw]
+  {:pre [(keyword? kw)]
+   :post [(keyword? %)
+          (nil? (namespace %))]}
+  (keyword (name kw)))
+
 (defn keep-going*
   "Executes the supplied fn repeatedly. Execution may be stopped with an
   InterruptedException."
@@ -509,7 +518,7 @@
                                       ["-h" "--help" "Show help" :default false :flag true])
         [options extras banner] (apply cli/cli args specs)]
     (when (:help options)
-      (throw+ {:type :help
+      (throw+ {:type ::cli-help
                :message banner}))
     (when-let [missing-field (some #(if (not (contains? options %)) %) required-args)]
       (let [msg (str
@@ -517,7 +526,7 @@
                   (format "Missing required argument '--%s'!" (name missing-field))
                   "\n\n"
                   banner)]
-        (throw+ {:type :error
+        (throw+ {:type ::cli-error
                  :message msg})))
     [options extras]))
 

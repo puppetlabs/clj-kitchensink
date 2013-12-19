@@ -192,6 +192,14 @@
       (testing "should still match"
         (is (= input output))))))
 
+(deftest without-ns-test
+  (testing "removes namespace from a namespaced keyword"
+    (is (= :foo (without-ns :foo/foo)))
+    (is (= :foo (without-ns ::foo))))
+  (testing "doesn't alter non-namespaced keyword"
+    (let [kw :foo]
+      (is (= kw (without-ns kw))))))
+
 (deftest string-hashing
   (testing "Computing a SHA-1 for a UTF-8 string"
     (testing "should fail if not passed a string"
@@ -253,7 +261,8 @@
         (cli! [] [["-r" "--required" "A required field"]] [:required])
         (catch map? m
           (is (contains? m :type))
-          (is (= :error (:type m)))
+          (is (= :puppetlabs.kitchensink.core/cli-error (:type m)))
+          (is (= :cli-error (without-ns (:type m))))
           (is (contains? m :message))
           (reset! got-expected-error true)))
       (is (true? @got-expected-error))))
@@ -264,7 +273,8 @@
         (cli! ["--help"] [] [])
         (catch map? m
           (is (contains? m :type))
-          (is (= :help (:type m)))
+          (is (= :puppetlabs.kitchensink.core/cli-help (:type m)))
+          (is (= :cli-help (without-ns (:type m))))
           (is (contains? m :message))
           (reset! got-expected-help true)))
       (is (true? @got-expected-help))))
