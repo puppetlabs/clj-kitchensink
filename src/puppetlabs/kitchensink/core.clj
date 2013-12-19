@@ -509,7 +509,7 @@
                                       ["-h" "--help" "Show help" :default false :flag true])
         [options extras banner] (apply cli/cli args specs)]
     (when (:help options)
-      (throw+ {:type :help
+      (throw+ {:type ::help
                :message banner}))
     (when-let [missing-field (some #(if (not (contains? options %)) %) required-args)]
       (let [msg (str
@@ -517,7 +517,7 @@
                   (format "Missing required argument '--%s'!" (name missing-field))
                   "\n\n"
                   banner)]
-        (throw+ {:type :error
+        (throw+ {:type ::error
                  :message msg})))
     [options extras]))
 

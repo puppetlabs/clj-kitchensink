@@ -253,7 +253,7 @@
         (cli! [] [["-r" "--required" "A required field"]] [:required])
         (catch map? m
           (is (contains? m :type))
-          (is (= :error (:type m)))
+          (is (= :puppetlabs.kitchensink.core/error (:type m)))
           (is (contains? m :message))
           (reset! got-expected-error true)))
       (is (true? @got-expected-error))))
@@ -264,7 +264,7 @@
         (cli! ["--help"] [] [])
         (catch map? m
           (is (contains? m :type))
-          (is (= :help (:type m)))
+          (is (= :puppetlabs.kitchensink.core/help (:type m)))
           (is (contains? m :message))
           (reset! got-expected-help true)))
       (is (true? @got-expected-help))))
