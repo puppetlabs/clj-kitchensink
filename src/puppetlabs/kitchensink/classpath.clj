@@ -38,7 +38,20 @@
   "A corollary to the (deprecated) `add-classpath` in clojure.core. This implementation
    requires a java.io.File or String path to a jar file or directory, and will attempt
    to add that path to the right classloader (with the search rooted at the current
-   thread's context classloader)."
+   thread's context classloader).
+
+   Because this function is a replacement for `add-classpath` in clojure.core,
+   if you simply `:require` this namespace and then `:refer` to this function, you
+   will get the following warning:
+
+      WARNING: add-classpath already refers to: #'clojure.core/add-classpath in
+      namespace: [...], being replaced by:
+      #'puppetlabs.kitchensink.classpath/add-classpath
+
+   You can avoid this by referencing this function through its namespace.
+
+   This function is copied out of the 'pomegranate' library
+   (https://github.com/cemerick/pomegranate)."
   ([jar-or-dir classloader]
    (if-not (dp/add-classpath-url classloader (.toURL (file jar-or-dir)))
      (throw (IllegalStateException. (str classloader " is not a modifiable classloader")))))
