@@ -8,7 +8,8 @@
 ;;;; Here, we have copied `add-classpath` out of pomegranate
 ;;;; (https://github.com/cemerick/pomegranate).
 ;;;;
-;;;; We did this because we need to use this function in trapperkeeper,
+;;;; We did this because we needed a corollary to the (deprecated)
+;;;; `add-classpath` function in clojure.core,
 ;;;; but we did not want to pull pomegranate's rather large dependency tree
 ;;;; (we tried excluding as many of its dependencies as possible, but only
 ;;;; a small part of its dependency tree was exclude-able).
