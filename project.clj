@@ -16,6 +16,9 @@
                  ;; Configuration file parsing
                  [org.ini4j/ini4j "0.5.2"]
                  [org.clojure/tools.cli "0.2.2"]
+                 ;; This library is used by puppetlabs.kitchensink.classpath
+                 ;; to do some classpath stuff.
+                 [org.tcrawley/dynapath "0.2.3"]
                  [digest "1.4.3"]
                  [clj-time "0.5.1"]
                  [slingshot "0.10.3"]
