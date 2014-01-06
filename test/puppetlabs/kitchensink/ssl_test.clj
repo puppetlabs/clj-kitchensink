@@ -25,6 +25,19 @@
                                  (.getBytes))
                              (.toByteArray pem-writer-stream))))))))
 
+(deftest multiple-certs
+  (testing "loading a PEM file with multiple certs"
+    (let [pem (resource "puppetlabs/kitchensink/examples/ssl/certs/multiple.pem")]
+      (testing "should return multiple certs"
+        (is (= 2 (count (pem->certs pem)))))
+
+      (testing "should load all certs from the file into a keystore"
+        (let [ks (keystore)]
+          (assoc-certs-from-file! ks "foobar" pem)
+          (is (= 2 (.size ks)))
+          (is (.containsAlias ks "foobar-0"))
+          (is (.containsAlias ks "foobar-1")))))))
+
 (deftest rsakeyonly
   (testing "reading PEM files with only the RSA-key should work"
     (let [privkey (resource "puppetlabs/kitchensink/examples/ssl/private_keys/keyonly.pem")]
