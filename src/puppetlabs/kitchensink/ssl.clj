@@ -68,7 +68,7 @@
 
 (defn pem->private-keys
   "Given the path to a PEM file (or some other object supported by clojure's `reader`),
-  decodes the contents into an instance of `PrivateKey`."
+  decodes the contents into a collection of `PrivateKey` instances."
   [pem]
   (map obj->private-key (pem->objs pem)))
 
