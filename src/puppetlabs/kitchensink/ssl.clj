@@ -70,6 +70,7 @@
   "Given the path to a PEM file (or some other object supported by clojure's `reader`),
   decodes the contents into a collection of `PrivateKey` instances."
   [pem]
+  {:post [(every? (fn [x] (instance? PrivateKey x)) %)]}
   (map obj->private-key (pem->objs pem)))
 
 (defn key->pem!
