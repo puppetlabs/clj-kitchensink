@@ -31,14 +31,6 @@
             (recur (conj objs obj)))
           objs)))))
 
-(defn pem->obj
-  "Given a file path (or any other type supported by clojure's `reader`), reads
-  a PEM-encoded object and returns an instance of the corresponding
-  type from `java.security`. If the supplied file contains more than
-  one object, only the first is returned."
-  [pem]
-  (first (pem->objs pem)))
-
 (defn obj->pem!
   "Encodes an object in PEM format, and writes it to a file (or other stream).  Arguments:
 
@@ -62,33 +54,23 @@
   {:post [(every? (fn [x] (instance? X509Certificate x)) %)]}
   (pem->objs pem))
 
-(defn pem->cert
-  "Given the path to a PEM file (or some other object supported by
-  clojure's `reader`), decodes the contents into an instance of
-  `X509Certificate`. If the supplied file contains more than one
-  certificate, only the first is returned."
-  [pem]
-  (first (pem->objs pem)))
+(defn obj->private-key
+  "Decodes the given object (read from a .PEM file via `pem->objs`)
+  into an instance of `PrivateKey`"
+  [obj]
+  {:post [(instance? PrivateKey %)]}
+  (cond
+   (instance? PrivateKey obj) obj
+   ;; Certain PEMs will hand back a keypair with a nil public key
+   (instance? KeyPair obj)    (.getPrivate obj)
+   :else
+   (throw (IllegalArgumentException. (format "Expected a KeyPair or PrivateKey, got %s" obj)))))
 
-(defn pem->private-key
+(defn pem->private-keys
   "Given the path to a PEM file (or some other object supported by clojure's `reader`),
   decodes the contents into an instance of `PrivateKey`."
   [pem]
-  {:post [(instance? PrivateKey %)]}
-  (let [obj (pem->obj pem)]
-    (cond
-      (instance? PrivateKey obj) obj
-      ;; Certain PEMs will hand back a keypair with a nil public key
-      (instance? KeyPair obj)    (.getPrivate obj)
-      :else
-      (throw (IllegalArgumentException. (format "Expected a KeyPair or PrivateKey, got %s" obj))))))
-
-(defn pem->public-key
-  "Given the path to a PEM file (or some other object supported by clojure's `reader`),
-  decodes the contents into an instance of `PublicKey`."
-  [pem]
-  {:post [(instance? PublicKey %)]}
-  (pem->obj pem))
+  (map obj->private-key (pem->objs pem)))
 
 (defn key->pem!
   "Encodes a public or private key to PEM format, and writes it to a file (or other
@@ -114,15 +96,6 @@
    :post [(instance? KeyStore %)]}
   (.setCertificateEntry keystore alias cert)
   keystore)
-
-(defn assoc-cert-file!
-  "Add a certificate from a PEM file to a keystore.  Arguments:
-
-  `keystore`: the `KeyStore` to add the certificate to
-  `alias`:    a String alias to associate with the certificate
-  `pem-cert`: the path to a PEM file containing the certificate"
-  [keystore alias pem-cert]
-  (assoc-cert! keystore alias (pem->cert pem-cert)))
 
 (defn assoc-certs-from-file!
   "Add all certificates from a PEM file to a keystore.  Arguments:
@@ -169,6 +142,12 @@
                      private key; a private key cannot be added to a keystore
                      without a signed certificate."
   [keystore alias pem-private-key pw pem-cert]
-  (let [key  (pem->private-key pem-private-key)
-        cert (pem->cert pem-cert)]
-    (assoc-private-key! keystore alias key pw cert)))
+  (let [keys  (pem->private-keys pem-private-key)
+        certs (pem->certs pem-cert)]
+    (when (> (count keys) 1)
+      (throw (IllegalArgumentException.
+              (format "The PEM file %s contains more than one key" pem-private-key))))
+    (when (> (count certs) 1)
+      (throw (IllegalArgumentException.
+              (format "The PEM file %s contains more than one certificate" pem-private-key))))
+    (assoc-private-key! keystore alias (first keys) pw (first certs))))
