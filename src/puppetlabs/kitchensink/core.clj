@@ -513,22 +513,31 @@
   ** The map is thrown using 'slingshot' (https://github.com/scgilardi/slingshot).
   It contains a `:type` and `:message`, where type is either `:error` or `:help`,
   and the message is either the error message or a help banner."
-  [args specs required-args]
-  (let [specs                   (conj specs
-                                      ["-h" "--help" "Show help" :default false :flag true])
-        [options extras banner] (apply cli/cli args specs)]
+  ([args specs] (cli! args specs nil))
+  ([args specs required-args]
+  (let [specs (conj specs ["-h" "--help" "Show help" :default false :flag true])
+        {:keys [options arguments summary errors]} (cli/parse-opts args specs)]
+    (when errors
+      (let [msg (str
+                  "\n\n"
+                  "Error(s) occurred while parsing command-line arguments: "
+                  (apply str errors)
+                  "\n\n"
+                  summary)]
+        (throw+ {:type ::cli-error
+                 :message msg})))
     (when (:help options)
       (throw+ {:type ::cli-help
-               :message banner}))
+               :message summary}))
     (when-let [missing-field (some #(if (not (contains? options %)) %) required-args)]
       (let [msg (str
                   "\n\n"
                   (format "Missing required argument '--%s'!" (name missing-field))
                   "\n\n"
-                  banner)]
+                  summary)]
         (throw+ {:type ::cli-error
                  :message msg})))
-    [options extras]))
+    [options arguments])))
 
 
 ;; ## SSL Certificate handling

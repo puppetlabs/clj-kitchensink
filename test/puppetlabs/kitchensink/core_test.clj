@@ -285,7 +285,22 @@
                                  ["-a" "--address" "Somebody's address"]] []))]
       (is (map? cli-data))
       (is (contains? cli-data :address))
-      (is (contains? cli-data :greeting)))))
+      (is (contains? cli-data :greeting))))
+
+  (testing "Errors reported by tools.cli should be thrown out of cli! as slingshot exceptions"
+    (let [got-expected-exception (atom false)]
+      (try+
+        (let [specs [["-f" "--foo FOO" "Something that is foo"]]
+              args  ["--bar"]]
+          (cli! args specs))
+        (catch map? m
+          (is (= :puppetlabs.kitchensink.core/cli-error (:type m)))
+          (is (contains? m :message))
+          (is (re-find
+                #"Unknown option.*--bar"
+                (m :message)))
+          (reset! got-expected-exception true)))
+      (is (true? @got-expected-exception)))))
 
 (deftest cert-utils
   (testing "extracting cn from a dn"
