@@ -513,7 +513,8 @@
   ** The map is thrown using 'slingshot' (https://github.com/scgilardi/slingshot).
   It contains a `:type` and `:message`, where type is either `:error` or `:help`,
   and the message is either the error message or a help banner."
-  [args specs required-args]
+  ([args specs] (cli! args specs nil))
+  ([args specs required-args]
   (let [specs (conj specs ["-h" "--help" "Show help" :default false :flag true])
         {:keys [options arguments summary errors]} (cli/parse-opts args specs)]
     (when errors
@@ -536,7 +537,7 @@
                   summary)]
         (throw+ {:type ::cli-error
                  :message msg})))
-    [options arguments]))
+    [options arguments])))
 
 
 ;; ## SSL Certificate handling
