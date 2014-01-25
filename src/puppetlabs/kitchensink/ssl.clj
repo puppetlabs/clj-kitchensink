@@ -1,14 +1,13 @@
 (ns puppetlabs.kitchensink.ssl
   (:import (java.security Key KeyPair PrivateKey PublicKey KeyStore Security)
            (java.security.cert X509Certificate)
-           (org.bouncycastle.openssl PEMReader PEMWriter)
-           (org.bouncycastle.jce.provider BouncyCastleProvider))
+           (org.bouncycastle.openssl PEMParser PEMKeyPair PEMWriter)
+           (org.bouncycastle.asn1.pkcs PrivateKeyInfo)
+           (org.bouncycastle.openssl.jcajce JcaPEMKeyConverter)
+           (org.bouncycastle.cert.jcajce JcaX509CertificateConverter))
   (:use [clojure.tools.logging :as log]
         [clojure.java.io :only (reader writer)]
         [puppetlabs.kitchensink.core :only (enumerate)]))
-
-;; Need to make sure that the provider is initialized
-(Security/addProvider (BouncyCastleProvider.))
 
 (defn keystore
   "Create an empty in-memory Java KeyStore object."
@@ -22,7 +21,7 @@
   corresponding type from `java.security`."
   [pem]
   {:post [(coll? %)]}
-  (let [pemreader (PEMReader. (reader pem))]
+  (let [pemreader (PEMParser. (reader pem))]
     (loop [objs []]
       (let [obj (.readObject pemreader)]
         (if obj
@@ -52,7 +51,8 @@
   `X509Certificate` instances."
   [pem]
   {:post [(every? (fn [x] (instance? X509Certificate x)) %)]}
-  (pem->objs pem))
+  (let [converter (JcaX509CertificateConverter.)]
+    (map #(.getCertificate converter %) (pem->objs pem))))
 
 (defn obj->private-key
   "Decodes the given object (read from a .PEM file via `pem->objs`)
@@ -60,9 +60,9 @@
   [obj]
   {:post [(instance? PrivateKey %)]}
   (cond
-   (instance? PrivateKey obj) obj
+   (instance? PrivateKeyInfo obj) (.getPrivateKey (JcaPEMKeyConverter.) obj)
    ;; Certain PEMs will hand back a keypair with a nil public key
-   (instance? KeyPair obj)    (.getPrivate obj)
+   (instance? PEMKeyPair obj)     (.getPrivate (.getKeyPair (JcaPEMKeyConverter.) obj))
    :else
    (throw (IllegalArgumentException. (format "Expected a KeyPair or PrivateKey, got %s" obj)))))
 

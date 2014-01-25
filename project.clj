@@ -13,7 +13,7 @@
                  [digest "1.4.3"]
                  [clj-time "0.5.1"]
                  ;; SSL
-                 [org.bouncycastle/bcpkix-jdk15on "1.49"]]
+                 [org.bouncycastle/bcpkix-jdk15on "1.50"]]
 
   :profiles {:dev {:resource-paths ["test-resources"]}}
 
