@@ -23,7 +23,7 @@
                  [clj-time "0.5.1"]
                  [slingshot "0.10.3"]
                  ;; SSL
-                 [org.bouncycastle/bcpkix-jdk15on "1.49"]]
+                 [org.bouncycastle/bcpkix-jdk15on "1.50"]]
 
   ;; By declaring a classifier here and a corresponding profile below we'll get an additional jar
   ;; during `lein jar` that has all the code in the test/ directory. Downstream projects can then
