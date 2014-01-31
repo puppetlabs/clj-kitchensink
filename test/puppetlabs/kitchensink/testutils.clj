@@ -1,4 +1,5 @@
-(ns puppetlabs.kitchensink.testutils)
+(ns puppetlabs.kitchensink.testutils
+  (:require [fs.core :as fs]))
 
 (defn call-counter
   "Returns a method that just tracks how many times it's called, and
@@ -20,3 +21,18 @@
   invoked."
   [f]
   (deref (:ncalls (meta f))))
+
+(defn delete-on-exit
+  "Will delete `f` on shutdown of the JVM"
+  [f]
+  (do
+    (.addShutdownHook (java.lang.Runtime/getRuntime) (Thread. #(fs/delete-dir f)))
+    f))
+
+(def ^{:doc "Creates a temporary file that will be deleted on JVM shutdown."}
+  temp-file
+  (comp delete-on-exit fs/temp-file))
+
+(def ^{:doc "Creates a temporary directory that will be deleted on JVM shutdown."}
+  temp-dir
+  (comp delete-on-exit fs/temp-dir))

@@ -23,7 +23,9 @@
                  [clj-time "0.5.1"]
                  [slingshot "0.10.3"]
                  ;; SSL
-                 [org.bouncycastle/bcpkix-jdk15on "1.50"]]
+                 [org.bouncycastle/bcpkix-jdk15on "1.50"]
+                 ;; JSON
+                 [cheshire "5.2.0"]]
 
   ;; By declaring a classifier here and a corresponding profile below we'll get an additional jar
   ;; during `lein jar` that has all the code in the test/ directory. Downstream projects can then
@@ -39,7 +41,7 @@
 
   :lein-release        {:scm          :git
                         :deploy-via   :lein-deploy}
-  
+
   :deploy-repositories [["releases" {:url "https://clojars.org/repo"
                                      :username :env/clojars_jenkins_username
                                      :password :env/clojars_jenkins_password
