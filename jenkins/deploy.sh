@@ -11,7 +11,7 @@ echo "Tests passed!"
 lein release
 echo "Release plugin successful, pushing changes to git"
 
-git push origin
-git push origin --tags
+git push origin `git rev-parse --abbrev-ref HEAD`
+git push origin --tags `git rev-parse --abbrev-ref HEAD`
 
 echo "git push successful."
