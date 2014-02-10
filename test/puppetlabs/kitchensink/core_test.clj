@@ -117,6 +117,18 @@
     (testing "should not remove the key if the value is not nil"
       (is (= testmap (dissoc-if-nil testmap :a))))))
 
+(deftest deep-merge-test
+  (testing "should deeply nest duplicate keys that both have map values"
+    (let [testmap-1 {:foo {:bar :baz}, :pancake :flapjack}
+          testmap-2 {:foo {:fuzz {:buzz :quux}}}]
+      (is (= {:foo {:bar :baz, :fuzz {:buzz :quux}}, :pancake :flapjack}
+             (deep-merge testmap-1 testmap-2)))))
+  (testing "should combine duplicate keys' values that aren't all maps by
+           calling the provided function"
+    (let [testmap-1 {:foo {:bars 2}}
+          testmap-2 {:foo {:bars 3, :bazzes 4}}]
+      (is (= {:foo {:bars 5, :bazzes 4}} (deep-merge-with + testmap-1 testmap-2))))))
+
 (deftest missing?-test
   (let [sample {:a "asdf" :b "asdf" :c "asdf"}]
     (testing "should return true for single key items if they don't exist in the coll"
