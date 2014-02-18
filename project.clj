@@ -33,7 +33,7 @@
   ;; code that we have.
   :classifiers [["test" :testutils]]
 
-  :profiles {:dev {:resource-paths ["test-resources"]}
+  :profiles {:dev {:test-paths ["test-resources"]}
              :testutils {:source-paths ^:replace ["test"]}}
 
   ;; this plugin is used by jenkins jobs to interrogate the project version
