@@ -535,7 +535,14 @@
 
   ** The map is thrown using 'slingshot' (https://github.com/scgilardi/slingshot).
   It contains a `:type` and `:message`, where type is either `:error` or `:help`,
-  and the message is either the error message or a help banner."
+  and the message is either the error message or a help banner.
+
+  Returns a three-item vector, containing:
+  * a map of the parsed options
+  * a vector containing the remaining cli arguments that were not parsed
+  * a string containing a summary of all of the options that are available; for
+    use in printing help messages if the user detects that the arguments are
+    still invalid in some way."
   ([args specs] (cli! args specs nil))
   ([args specs required-args]
   (let [specs (conj specs ["-h" "--help" "Show help" :default false :flag true])
@@ -560,7 +567,7 @@
                   summary)]
         (throw+ {:type ::cli-error
                  :message msg})))
-    [options arguments])))
+    [options arguments summary])))
 
 
 ;; ## SSL Certificate handling

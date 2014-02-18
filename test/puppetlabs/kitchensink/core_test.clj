@@ -291,13 +291,22 @@
           (reset! got-expected-help true)))
       (is (true? @got-expected-help))))
 
-  (testing "Should return a map after parsing CLI args"
-    (let [cli-data (first (cli! ["-a" "1234 Sunny ave." "-g" "Hey, what's up?"]
-                                [["-g" "--greeting" "A string to greet somebody"]
-                                 ["-a" "--address" "Somebody's address"]] []))]
+  (testing "Should return options map, remaining args, and summary after parsing CLI args"
+    (let [[cli-data remaining-args summary] (cli! ["-a" "1234 Sunny ave." "--greeting" "Hey, what's up?" "--toggle" "extra-arg"]
+                                               [["-g" "--greeting GREETING" "A string to greet somebody"]
+                                                ["-a" "--address ADDRESS" "Somebody's address"]
+                                                ["-t" "--toggle" "A flag/boolean option"]] [])]
       (is (map? cli-data))
-      (is (contains? cli-data :address))
-      (is (contains? cli-data :greeting))))
+      (is (= "1234 Sunny ave." (cli-data :address)))
+      (is (= "Hey, what's up?" (cli-data :greeting)))
+      (is (= true (cli-data :toggle)))
+      (is (vector? remaining-args))
+      (is (= ["extra-arg"] remaining-args))
+      (is (= (str "  -g, --greeting GREETING  A string to greet somebody\n"
+                  "  -a, --address ADDRESS    Somebody's address\n"
+                  "  -t, --toggle             A flag/boolean option\n"
+                  "  -h, --help               Show help")
+             summary))))
 
   (testing "Errors reported by tools.cli should be thrown out of cli! as slingshot exceptions"
     (let [got-expected-exception (atom false)]
