@@ -37,7 +37,8 @@
              :testutils {:source-paths ^:replace ["test"]}}
 
   ;; this plugin is used by jenkins jobs to interrogate the project version
-  :plugins [[lein-project-version "0.1.0"]]
+  :plugins [[lein-project-version "0.1.0"]
+            [lein-release "1.0.5"]]
 
   :lein-release        {:scm          :git
                         :deploy-via   :lein-deploy}
