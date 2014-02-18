@@ -60,9 +60,9 @@
 (deftest pems->keystores-test
   (testing "should be able to convert pems to keystore/truststore"
     (let [result (pems->key-and-trust-stores
-                   {:cert     (resource "puppetlabs/kitchensink/examples/ssl/certs/localhost.pem")
-                    :key      (resource "puppetlabs/kitchensink/examples/ssl/private_keys/localhost.pem")
-                    :ca-cert  (resource "puppetlabs/kitchensink/examples/ssl/certs/ca.pem")})]
+                   (resource "puppetlabs/kitchensink/examples/ssl/certs/localhost.pem")
+                   (resource "puppetlabs/kitchensink/examples/ssl/private_keys/localhost.pem")
+                   (resource "puppetlabs/kitchensink/examples/ssl/certs/ca.pem")                   )]
       (is (map? result))
       (is (= #{:keystore :keystore-pw :truststore} (ks/keyset result)))
       (is (instance? KeyStore (:keystore result)))
@@ -72,7 +72,7 @@
 (deftest pems->ssl-context-test
   (testing "should be able to convert pems to SSLContext"
     (let [result (pems->ssl-context
-                   {:cert     (resource "puppetlabs/kitchensink/examples/ssl/certs/localhost.pem")
-                    :key      (resource "puppetlabs/kitchensink/examples/ssl/private_keys/localhost.pem")
-                    :ca-cert  (resource "puppetlabs/kitchensink/examples/ssl/certs/ca.pem")})]
+                   (resource "puppetlabs/kitchensink/examples/ssl/certs/localhost.pem")
+                   (resource "puppetlabs/kitchensink/examples/ssl/private_keys/localhost.pem")
+                   (resource "puppetlabs/kitchensink/examples/ssl/certs/ca.pem"))]
       (is (instance? SSLContext result)))))

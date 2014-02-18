@@ -192,7 +192,7 @@
   * `:keystore` - an instance of KeyStore initialized with the cert and private key
   * `:keystore-pw` - a string containing a dynamically generated password for the KeyStore
   * `:truststore` - an instance of KeyStore containing the CA cert."
-  [{:keys [cert key ca-cert]}]
+  [cert key ca-cert]
   {:pre  [key
           cert
           ca-cert]
@@ -220,12 +220,12 @@
   reference a PEM that contains the appropriate cert/key.
 
   Returns the SSLContext instance."
-  [{:keys [cert key ca-cert] :as pems}]
+  [cert key ca-cert]
   {:pre  [key
           cert
           ca-cert]
    :post [(instance? SSLContext %)]}
-  (let [stores  (pems->key-and-trust-stores pems)
+  (let [stores  (pems->key-and-trust-stores cert key ca-cert)
         kmf     (get-key-manager-factory stores)
         tmf     (get-trust-manager-factory stores)
         ctxt    (SSLContext/getInstance "SSL")]
