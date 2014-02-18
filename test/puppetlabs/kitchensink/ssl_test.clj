@@ -1,9 +1,11 @@
 (ns puppetlabs.kitchensink.ssl-test
   (:import java.util.Arrays
-           [java.security PrivateKey])
-  (:use clojure.test
-        puppetlabs.kitchensink.ssl
-        [clojure.java.io :only [resource reader]]))
+           [java.security PrivateKey KeyStore]
+           (javax.net.ssl SSLContext))
+  (:require [clojure.test :refer :all]
+            [puppetlabs.kitchensink.ssl :refer :all]
+            [puppetlabs.kitchensink.core :as ks]
+            [clojure.java.io :refer [resource reader]]))
 
 (deftest privkeys
   (testing "assoc-private-key-file!"
@@ -54,3 +56,23 @@
   (testing "reading PEM files with only the RSA-key should work"
     (let [privkey (resource "puppetlabs/kitchensink/examples/ssl/private_keys/keyonly.pem")]
       (is (every? #(instance? PrivateKey %) (pem->private-keys privkey))))))
+
+(deftest pems->keystores-test
+  (testing "should be able to convert pems to keystore/truststore"
+    (let [result (pems->key-and-trust-stores
+                   (resource "puppetlabs/kitchensink/examples/ssl/certs/localhost.pem")
+                   (resource "puppetlabs/kitchensink/examples/ssl/private_keys/localhost.pem")
+                   (resource "puppetlabs/kitchensink/examples/ssl/certs/ca.pem")                   )]
+      (is (map? result))
+      (is (= #{:keystore :keystore-pw :truststore} (ks/keyset result)))
+      (is (instance? KeyStore (:keystore result)))
+      (is (instance? KeyStore (:truststore result)))
+      (is (string? (:keystore-pw result))))))
+
+(deftest pems->ssl-context-test
+  (testing "should be able to convert pems to SSLContext"
+    (let [result (pems->ssl-context
+                   (resource "puppetlabs/kitchensink/examples/ssl/certs/localhost.pem")
+                   (resource "puppetlabs/kitchensink/examples/ssl/private_keys/localhost.pem")
+                   (resource "puppetlabs/kitchensink/examples/ssl/certs/ca.pem"))]
+      (is (instance? SSLContext result)))))
