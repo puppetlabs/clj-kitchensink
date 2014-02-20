@@ -478,3 +478,8 @@
                   :bar {:foo "baz"}
                   :baz {:foo "bar"}}
                 (ini-to-map result-file))))))))
+
+(deftest test-get-tmp-copy-of-resource
+  (testing "reading resource from a temp file"
+    (let [file (get-tmp-copy-of-resource "../test-resources/foo_bar.txt")]
+      (is (= (slurp file) "foo.bar")))))
