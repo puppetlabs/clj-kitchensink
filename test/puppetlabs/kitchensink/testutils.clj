@@ -25,9 +25,8 @@
 (defn delete-on-exit
   "Will delete `f` on shutdown of the JVM"
   [f]
-  (do
-    (.addShutdownHook (java.lang.Runtime/getRuntime) (Thread. #(fs/delete-dir f)))
-    f))
+  (.deleteOnExit (fs/file f))
+  f)
 
 (def ^{:doc "Creates a temporary file that will be deleted on JVM shutdown."}
   temp-file

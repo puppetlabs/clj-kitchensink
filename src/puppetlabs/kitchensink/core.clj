@@ -5,9 +5,9 @@
 ;; altogether. But who has time for that?
 
 (ns puppetlabs.kitchensink.core
-  (:import [org.ini4j Ini]
+  (:import [org.ini4j Ini Config]
            [javax.naming.ldap LdapName]
-           [java.io StringWriter])
+           [java.io StringWriter Reader])
   (:require [clojure.test]
             [clojure.tools.logging :as log]
             [clojure.string :as string]
@@ -229,6 +229,24 @@
         (recur ret (first ks) (next ks))
         ret))))
 
+(defn merge-with-key
+  "Returns a map that consists of the rest of the maps conj-ed onto
+  the first.  If a key `k` occurs in more than one map, the mapping(s)
+  from the latter (left-to-right) will be combined with the mapping in
+  the result by calling (f k val-in-result val-in-latter)."
+  {:added "1.0"
+   :static true}
+  [f & maps]
+  (when (some identity maps)
+    (let [merge-entry (fn [m e]
+                        (let [k (key e) v (val e)]
+                          (if (contains? m k)
+                            (assoc m k (f k (get m k) v))
+                            (assoc m k v))))
+          merge2 (fn [m1 m2]
+                   (reduce merge-entry (or m1 {}) (seq m2)))]
+      (reduce merge2 maps))))
+
 (defn deep-merge
   "Deeply merges maps so that nested maps are combined rather than replaced.
 
@@ -251,6 +269,22 @@
   (if (every? map? vs)
     (apply merge-with (partial deep-merge-with f) vs)
     (apply f vs)))
+
+(defn deep-merge-with-keys*
+  "Helper function for deep-merge-with-keys"
+  [f ks & vs]
+  (if (every? map? vs)
+    (apply merge-with-key
+           (fn [k & vs] (apply deep-merge-with-keys* f (conj ks k) vs))
+           vs)
+    (apply f ks vs)))
+
+(defn deep-merge-with-keys
+  "Deeply merges like `deep-merge`, but uses `f` to produce a value from the
+  conflicting values for a key path `ks` that appears in multiple maps, by calling
+  `(f ks val-in-result val-in-latter)`."
+  [f & vs]
+  (apply deep-merge-with-keys* f [] vs))
 
 (defn keyset
   "Returns the set of keys from the supplied map"
@@ -433,10 +467,27 @@
   "Given an INI section, create a clojure map of it's key/values"
   [section]
   (reduce (fn [acc [key _]]
-            (assoc acc
-              (keywordize key)
-              (fetch-int section key)))
+            (if (> (.length section key) 1)
+              (throw (IllegalArgumentException.
+                       (str "Duplicate configuration entry: "
+                            (mapv keyword [(.getName section) key]))))
+              (assoc acc
+                (keywordize key)
+                (fetch-int section key))))
           {} section))
+
+(defn parse-ini
+  "Takes a reader that contains an ini file, and returns an Ini object
+  containing the parsed results"
+  [ini-reader]
+  {:pre [(instance? Reader ini-reader)]
+   :post [(instance? Ini %)]}
+  (let [config (Config.)
+        ini (Ini.)]
+    (.setMultiOption config true)
+    (.setConfig ini config)
+    (.load ini ini-reader)
+    ini))
 
 (defn ini-to-map
   "Takes a .ini filename and returns a nested map of
@@ -454,7 +505,8 @@
             (assoc acc
               (keywordize name)
               (create-section-map section)))
-          {} (Ini. (reader filename))))
+          {}
+          (parse-ini (reader filename))))
 
 (defn inis-to-map
   "Takes a path and converts the pointed-at .ini files into a nested
@@ -472,10 +524,12 @@
                   [path]
                   (fs/glob (fs/file path glob-pattern)))]
       (->> files
-        (sort)
         (map fs/absolute-path)
         (map ini-to-map)
-        (apply merge)
+        (apply deep-merge-with-keys
+               (fn [ks & _]
+                 (throw (IllegalArgumentException.
+                          (str "Duplicate configuration entry: " ks)))))
         (merge {})))))
 
 (defn spit-ini
