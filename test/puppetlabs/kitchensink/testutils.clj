@@ -1,5 +1,6 @@
 (ns puppetlabs.kitchensink.testutils
-  (:require [fs.core :as fs]))
+  (:require [fs.core :as fs]
+            [puppetlabs.kitchensink.core :as ks]))
 
 (defn call-counter
   "Returns a method that just tracks how many times it's called, and
@@ -36,3 +37,8 @@
 (def ^{:doc "Creates a temporary directory that will be deleted on JVM shutdown."}
   temp-dir
   (comp delete-on-exit fs/temp-dir))
+
+(defmacro with-no-jvm-shutdown-hooks
+  [& body]
+  `(with-redefs [ks/add-shutdown-hook! (fn [_#] nil)]
+    ~@body))
