@@ -7,11 +7,13 @@
 (ns puppetlabs.kitchensink.core
   (:import [org.ini4j Ini]
            [javax.naming.ldap LdapName]
-           [java.io StringWriter])
+           [java.io StringWriter]
+           [java.io File])
   (:require [clojure.test]
             [clojure.tools.logging :as log]
             [clojure.string :as string]
             [clojure.tools.cli :as cli]
+            [clojure.java.io :as io]
             [digest]
             [slingshot.slingshot :refer [throw+]]
             [fs.core :as fs])
@@ -724,3 +726,20 @@
     `(let [~g ~expr
            ~@(interleave (repeat g) (map pstep forms))]
        ~g)))
+
+;; ## Resources handling
+
+(defn get-tmp-copy-of-resource
+  "Copies a resource, defined by its path (relative to the source folder), to a temporary file. The temp file is deleted when the JVM terminates."
+  [path]
+  {:pre [(string? path)]}
+  (let [class-loader (.getContextClassLoader (Thread/currentThread))
+        resource-is (.getResourceAsStream class-loader path)
+        tmp-file (File/createTempFile "resource" nil)]
+    (.deleteOnExit tmp-file)
+    (assert (not (nil? resource-is)) (format "Unknown resource '%s'" path))
+    (io/copy resource-is tmp-file)
+    tmp-file)
+  )
+
+
