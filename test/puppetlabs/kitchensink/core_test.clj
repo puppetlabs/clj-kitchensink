@@ -1,9 +1,9 @@
 (ns puppetlabs.kitchensink.core-test
   (:require [fs.core :as fs]
             [slingshot.slingshot :refer [try+]]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [puppetlabs.kitchensink.testutils :as testutils])
   (:use [puppetlabs.kitchensink.core]
-        [puppetlabs.kitchensink.testutils]
         [clojure.test]))
 
 (deftest array?-test
@@ -117,6 +117,15 @@
     (testing "should not remove the key if the value is not nil"
       (is (= testmap (dissoc-if-nil testmap :a))))))
 
+(deftest merge-with-key-test
+  (let [m1        {:a 1 :b 2}
+        m2        {:a 3 :b 4}
+        merge-fn  (fn [k v1 v2]
+                    (if (= k :a)
+                      (+ v1 v2)
+                      v2))]
+    (is (= {:a 4 :b 4} (merge-with-key merge-fn m1 m2)))))
+
 (deftest deep-merge-test
   (testing "should deeply nest duplicate keys that both have map values"
     (let [testmap-1 {:foo {:bar :baz}, :pancake :flapjack}
@@ -127,7 +136,15 @@
            calling the provided function"
     (let [testmap-1 {:foo {:bars 2}}
           testmap-2 {:foo {:bars 3, :bazzes 4}}]
-      (is (= {:foo {:bars 5, :bazzes 4}} (deep-merge-with + testmap-1 testmap-2))))))
+      (is (= {:foo {:bars 5, :bazzes 4}} (deep-merge-with + testmap-1 testmap-2)))))
+  (testing "deep-merge-with-keys should pass keys to specified fn"
+    (let [m1        {:a {:b 1 :c 2}}
+          m2        {:a {:b 3 :c 4}}
+          merge-fn  (fn [ks v1 v2]
+                       (if (= ks [:a :b])
+                         (+ v1 v2)
+                         v2))]
+      (is (= {:a {:b 4 :c 4}} (deep-merge-with-keys merge-fn m1 m2))))))
 
 (deftest missing?-test
   (let [sample {:a "asdf" :b "asdf" :c "asdf"}]
@@ -228,7 +245,7 @@
 (deftest ini-parsing
   (testing "Parsing ini files"
     (testing "should work for a single file"
-      (let [tf (fs/temp-file)]
+      (let [tf (testutils/temp-file)]
         (spit tf "[foo]\nbar=baz")
 
         (testing "when specified as a file object"
@@ -240,31 +257,25 @@
                 {:foo {:bar "baz"}})))))
 
     (testing "should work for a directory"
-      (let [td (fs/temp-dir)]
+      (let [td (testutils/temp-dir)]
         (testing "when no matching files exist"
           (is (= (inis-to-map td) {})))
 
-        (spit (fs/file td "a.ini") "[foo]\nbar=baz")
+        (let [tf (testutils/temp-file "a-test" ".ini" td)]
+          (spit tf "[foo]\nbar=baz"))
 
         (testing "when only a single matching file exists"
           (is (= (inis-to-map td)
                 {:foo {:bar "baz"}})))
 
-        ;; Now add a second file
-        (spit (fs/file td "b.ini") "[bar]\nbar=baz")
+        (let [tf (testutils/temp-file "b-test" ".ini" td)]
+          ;; Now add a second file
+          (spit tf "[bar]\nbar=baz"))
 
         (testing "when multiple matching files exist"
           (is (= (inis-to-map td)
                 {:foo {:bar "baz"}
-                 :bar {:bar "baz"}})))
-
-        ;; Now add a file that clobbers data from another
-        (spit (fs/file td "c.ini") "[bar]\nbar=goo")
-
-        (testing "when multiple matching files exist"
-          (is (= (inis-to-map td)
-                {:foo {:bar "baz"}
-                 :bar {:bar "goo"}})))))))
+                 :bar {:bar "baz"}})))))))
 
 (deftest cli-parsing
   (testing "Should throw an error if a required option is missing"
@@ -362,8 +373,7 @@
             (cn-whitelist->authorizer "/this/does/not/exist"))))
 
     (testing "when whitelist is present"
-      (let [whitelist (fs/temp-file)]
-        (.deleteOnExit whitelist)
+      (let [whitelist (testutils/temp-file)]
         (spit whitelist "foo\nbar\n")
 
         (let [authorized? (cn-whitelist->authorizer whitelist)]
@@ -387,38 +397,38 @@
     (is (thrown? AssertionError (bounded-memoize identity "five"))))
 
   (testing "with a legal bound"
-    (let [f (call-counter)
+    (let [f (testutils/call-counter)
           memoized (bounded-memoize f 2)]
       (testing "should only call the function once per argument"
-        (is (= (times-called f) 0))
+        (is (= (testutils/times-called f) 0))
 
         (memoized 0)
-        (is (= (times-called f) 1))
+        (is (= (testutils/times-called f) 1))
 
         (memoized 0)
-        (is (= (times-called f) 1))
+        (is (= (testutils/times-called f) 1))
 
         (memoized 1)
-        (is (= (times-called f) 2)))
+        (is (= (testutils/times-called f) 2)))
 
       ;; We call it here for a hit, which we expect not to clear the cache,
       ;; then call it again to verify the cache wasn't cleared and therefore f
       ;; wasn't called
       (testing "should not clear the cache at max size on a hit"
         (memoized 1)
-        (is (= (times-called f) 2))
+        (is (= (testutils/times-called f) 2))
 
         (memoized 1)
-        (is (= (times-called f) 2)))
+        (is (= (testutils/times-called f) 2)))
 
       ;; Now call it with a new argument to clear the cache, then with an old
       ;; one to show f is called
       (testing "should clear the cache at max size on a miss"
         (memoized 2)
-        (is (= (times-called f) 3))
+        (is (= (testutils/times-called f) 3))
 
         (memoized 3)
-        (is (= (times-called f) 4))))))
+        (is (= (testutils/times-called f) 4))))))
 
 (deftest jvm-versions
   (testing "comparing same versions should return 0"
@@ -457,14 +467,14 @@
             (keys))))))
 
 (deftest test-spit-ini
-  (let [tf (fs/temp-file)]
+  (let [tf (testutils/temp-file)]
     (spit tf "[foo]\nbar=baz\n[bar]\nfoo=baz")
     (let [ini-map (ini-to-map tf)]
       (is (= ini-map
             {:foo {:bar "baz"}
              :bar {:foo "baz"}}))
       (testing "changing existing keys"
-        (let [result-file (fs/temp-file)]
+        (let [result-file (testutils/temp-file)]
           (spit-ini result-file (-> ini-map
                                   (assoc-in [:foo :bar] "baz changed")
                                   (assoc-in [:bar :foo] "baz also changed")))
@@ -472,9 +482,40 @@
                   :bar {:foo "baz also changed"}}
                 (ini-to-map result-file)))))
       (testing "adding a new section to an existing ini"
-        (let [result-file (fs/temp-file)]
+        (let [result-file (testutils/temp-file)]
           (spit-ini result-file (assoc-in ini-map [:baz :foo] "bar"))
           (is (= {:foo {:bar "baz"}
                   :bar {:foo "baz"}
                   :baz {:foo "bar"}}
                 (ini-to-map result-file))))))))
+
+(deftest duplicate-ini-entries
+  (testing "duplicate settings"
+    (let [tempfile (testutils/temp-file)]
+      (spit tempfile "[foo]\nbar=baz\nbar=bizzle\n")
+      (is (thrown-with-msg?
+            IllegalArgumentException
+            #"Duplicate configuration entry: \[:foo :bar\]"
+            (ini-to-map tempfile))))
+
+    (let [tempdir   (testutils/temp-dir)
+          tempfile1 (testutils/temp-file "initest" ".ini" tempdir)
+          tempfile2 (testutils/temp-file "initest" ".ini" tempdir)]
+      (spit tempfile1 "[foo]\nsetting1=hi\nbar=baz\n")
+      (spit tempfile2 "[foo]\nsetting2=hi\nbar=bizzle\n")
+      (is (thrown-with-msg?
+            IllegalArgumentException
+            #"Duplicate configuration entry: \[:foo :bar\]"
+            (inis-to-map tempdir)))))
+
+  (testing "duplicate sections but no duplicate settings"
+    (let [tempdir   (testutils/temp-dir)
+          tempfile1 (testutils/temp-file "initest" ".ini" tempdir)
+          tempfile2 (testutils/temp-file "initest" ".ini" tempdir)]
+      (spit tempfile1 "[foo]\nsetting1=hi\nbar=baz\n")
+      (spit tempfile2 "[foo]\nsetting2=hi\nbunk=bizzle\n")
+      (is (= {:foo {:setting1 "hi"
+                    :bar      "baz"
+                    :setting2 "hi"
+                    :bunk     "bizzle"}}
+             (inis-to-map tempdir))))))
