@@ -25,7 +25,7 @@
                  ;; SSL
                  [org.bouncycastle/bcpkix-jdk15on "1.50"]
                  ;; JSON
-                 [cheshire "5.2.0"]]
+                 [cheshire "5.3.1"]]
 
   ;; By declaring a classifier here and a corresponding profile below we'll get an additional jar
   ;; during `lein jar` that has all the code in the test/ directory. Downstream projects can then
