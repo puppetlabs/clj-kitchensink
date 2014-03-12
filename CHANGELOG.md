@@ -1,3 +1,6 @@
+## 0.5.4
+* Upgrade cheshire dependency to version 5.3.1.
+
 ## 0.5.3
 * .ini parsing utilities now throw an Exception if a key appears in the file(s) more than once.
 * Added a `with-no-jvm-shutdown-hooks` macro for running a block of code without any JVM shutdown hooks.
