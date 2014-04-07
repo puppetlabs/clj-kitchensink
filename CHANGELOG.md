@@ -1,3 +1,6 @@
+## 0.6.0
+* Remove SSL utility code, which is now available in puppetlabs/certificate-authority.
+
 ## 0.5.4
 * Upgrade cheshire dependency to version 5.3.1.
 
