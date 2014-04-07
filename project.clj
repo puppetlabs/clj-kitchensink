@@ -22,8 +22,6 @@
                  [digest "1.4.3"]
                  [clj-time "0.5.1"]
                  [slingshot "0.10.3"]
-                 ;; SSL
-                 [org.bouncycastle/bcpkix-jdk15on "1.50"]
                  ;; JSON
                  [cheshire "5.3.1"]]
 
@@ -33,8 +31,7 @@
   ;; code that we have.
   :classifiers [["test" :testutils]]
 
-  :profiles {:dev {:test-paths ["test-resources"]
-                   :dependencies [[spyscope "0.1.4"]]
+  :profiles {:dev {:dependencies [[spyscope "0.1.4"]]
                    :injections [(require 'spyscope.core)]}
              :testutils {:source-paths ^:replace ["test"]}}
 
