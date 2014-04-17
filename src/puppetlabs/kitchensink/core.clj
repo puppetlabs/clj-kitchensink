@@ -7,7 +7,7 @@
 (ns puppetlabs.kitchensink.core
   (:import [org.ini4j Ini Config]
            [javax.naming.ldap LdapName]
-           [java.io StringWriter Reader])
+           [java.io StringWriter Reader IOException File])
   (:require [clojure.test]
             [clojure.tools.logging :as log]
             [clojure.string :as string]
@@ -87,6 +87,39 @@
     (fs/file)
     (reader)
     (line-seq)))
+
+(defn mkdirs!
+  "Given a path (may be a File or a string), creates a directory (including any
+  missing parent directories).  Throws a slingshot exception with a meaningful
+  error message if the directory cannot be created.
+
+  (The reason for the existence of this function is that the Java File.mkdirs
+  method only returns a boolean indicating whether the directory was created;
+  if you get back a `false`, you have no idea whether it failed due to permission
+  errors, or the path being invalid in some way, or the directory already exists.)
+
+  The slingshot exception will look like this:
+
+  `{:type     :puppetlabs.kitchensink.core/io-error
+    :message  \"Parent directory '/foo/bar' is not writable\"}`"
+  [path]
+  {:pre [((some-fn #(instance? File %) string?) path)]
+   :post [(fs/directory? path)]}
+  (doseq [dir (reverse (cons path (fs/parents path)))]
+    (when-not (fs/exists? dir)
+      (let [parent (.getParentFile dir)]
+        (when (fs/file? parent)
+          (throw+ {:type ::io-error
+                   :message (format "Parent directory '%s' is a file" parent)}))
+
+        (when-not (.canWrite parent)
+          (throw+ {:type ::io-error
+                   :message (format "Parent directory '%s' is not writable" parent)}))
+
+        (let [success (.mkdir dir)]
+          (when-not success
+            (throw {:type ::io-error
+                    :message (format "Unable to create directory '%s'" parent)})))))))
 
 ;; ## Math
 
