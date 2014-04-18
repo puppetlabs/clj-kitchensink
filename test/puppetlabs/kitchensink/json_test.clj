@@ -2,7 +2,7 @@
   (:require [cheshire.generate :refer [remove-encoder]]
             [clj-time.core :as clj-time]
             [clojure.tools.logging :as log]
-            [fs.core :as fs]
+            [me.raynes.fs :as fs]
             [puppetlabs.kitchensink.testutils :refer [temp-file]])
   (:import (java.io StringWriter StringReader))
   (:use clojure.test

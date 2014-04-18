@@ -14,7 +14,7 @@
             [clojure.tools.cli :as cli]
             [digest]
             [slingshot.slingshot :refer [throw+]]
-            [fs.core :as fs])
+            [me.raynes.fs :as fs])
   (:use [clojure.java.io :only (reader)]
         [clojure.set :only (difference union)]
         [clojure.string :only (split)]

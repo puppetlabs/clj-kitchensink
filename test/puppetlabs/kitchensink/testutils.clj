@@ -1,5 +1,5 @@
 (ns puppetlabs.kitchensink.testutils
-  (:require [fs.core :as fs]
+  (:require [me.raynes.fs :as fs]
             [puppetlabs.kitchensink.core :as ks]))
 
 (defn call-counter
@@ -29,13 +29,20 @@
   (.deleteOnExit (fs/file f))
   f)
 
-(def ^{:doc "Creates a temporary file that will be deleted on JVM shutdown."}
-  temp-file
-  (comp delete-on-exit fs/temp-file))
+(defn temp-file
+  "Creates a temporary file that will be deleted on JVM shutdown."
+  [& args]
+  (if (empty? args)
+    (delete-on-exit (fs/temp-file nil))
+    (delete-on-exit (apply fs/temp-file args))))
 
-(def ^{:doc "Creates a temporary directory that will be deleted on JVM shutdown."}
+(defn temp-dir
+  "Creates a temporary directory that will be deleted on JVM shutdown."
+  [& args]
   temp-dir
-  (comp delete-on-exit fs/temp-dir))
+  (if (empty? args)
+    (delete-on-exit (fs/temp-dir nil))
+    (delete-on-exit (apply fs/temp-dir args))))
 
 (defmacro with-no-jvm-shutdown-hooks
   [& body]

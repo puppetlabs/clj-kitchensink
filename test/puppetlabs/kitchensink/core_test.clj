@@ -1,5 +1,5 @@
 (ns puppetlabs.kitchensink.core-test
-  (:require [fs.core :as fs]
+  (:require [me.raynes.fs :as fs]
             [slingshot.slingshot :refer [try+]]
             [clojure.string :as string]
             [puppetlabs.kitchensink.testutils :as testutils])
@@ -261,14 +261,14 @@
         (testing "when no matching files exist"
           (is (= (inis-to-map td) {})))
 
-        (let [tf (testutils/temp-file "a-test" ".ini" td)]
+        (let [tf (fs/file td "a-test.ini")]
           (spit tf "[foo]\nbar=baz"))
 
         (testing "when only a single matching file exists"
           (is (= (inis-to-map td)
                 {:foo {:bar "baz"}})))
 
-        (let [tf (testutils/temp-file "b-test" ".ini" td)]
+        (let [tf (fs/file td "b-test.ini")]
           ;; Now add a second file
           (spit tf "[bar]\nbar=baz"))
 
@@ -499,8 +499,8 @@
             (ini-to-map tempfile))))
 
     (let [tempdir   (testutils/temp-dir)
-          tempfile1 (testutils/temp-file "initest" ".ini" tempdir)
-          tempfile2 (testutils/temp-file "initest" ".ini" tempdir)]
+          tempfile1 (fs/file tempdir "initest1.ini")
+          tempfile2 (fs/file tempdir "initest2.ini")]
       (spit tempfile1 "[foo]\nsetting1=hi\nbar=baz\n")
       (spit tempfile2 "[foo]\nsetting2=hi\nbar=bizzle\n")
       (is (thrown-with-msg?
@@ -510,8 +510,8 @@
 
   (testing "duplicate sections but no duplicate settings"
     (let [tempdir   (testutils/temp-dir)
-          tempfile1 (testutils/temp-file "initest" ".ini" tempdir)
-          tempfile2 (testutils/temp-file "initest" ".ini" tempdir)]
+          tempfile1 (fs/file tempdir "initest1.ini")
+          tempfile2 (fs/file tempdir "initest.ini")]
       (spit tempfile1 "[foo]\nsetting1=hi\nbar=baz\n")
       (spit tempfile2 "[foo]\nsetting2=hi\nbunk=bizzle\n")
       (is (= {:foo {:setting1 "hi"
