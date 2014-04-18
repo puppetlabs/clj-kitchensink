@@ -54,12 +54,40 @@
 
 ;; ## String utilities
 
+(defn strict-parse-bool
+  "Parse a string and return its boolean value; throws an exception if the String
+  does not match `\"true\"` or `\"false\"` (case-insensitive)."
+  [s]
+  {:pre [(string? s)]
+   :post [(boolean? %)]}
+  (condp = (.toLowerCase s)
+    "true" true
+    "false" false
+    (throw+ {:type ::parse-error
+             :message (format "Unable to parse '%s' to a boolean" s)})))
+
 (defn parse-bool
   "Parse a string and return its boolean value."
   [s]
   {:pre [(or (nil? s) (string? s))]
    :post [(boolean? %)]}
   (Boolean/parseBoolean s))
+
+(defn to-bool
+  "Converts the argument to a boolean.  The behavior is as follows:
+
+   * If the argument is a Boolean, it is simply returned.
+   * If the argument is a String, returns the Boolean `true` if the String
+     matches `\"true\"` (case insensitive), or `false` if the String matches
+     `\"false\"` (case insensitive).  Throws an exception otherwise.
+   * If the argument is `nil`, returns false."
+  [val]
+  {:pre [((some-fn boolean? string? nil?) val)]
+   :post [(boolean? %)]}
+  (cond
+    (boolean? val) val
+    (string? val) (strict-parse-bool val)
+    (nil? val) false))
 
 (defn string-contains?
   "Returns true if `s` has the `substring` in it"
