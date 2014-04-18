@@ -14,7 +14,7 @@
             [clojure.tools.cli :as cli]
             [digest]
             [slingshot.slingshot :refer [throw+]]
-            [fs.core :as fs])
+            [me.raynes.fs :as fs])
   (:use [clojure.java.io :only (reader)]
         [clojure.set :only (difference union)]
         [clojure.string :only (split)]
@@ -481,6 +481,45 @@
      ~@body
      (catch Throwable e#
        (deliver ~error e#))))
+
+;; ## Temp files
+
+(defn delete-on-exit
+  "Will delete `f` on shutdown of the JVM"
+  [f]
+  (.deleteOnExit (fs/file f))
+  f)
+
+(defn temp-file
+  "Creates a temporary file that will be deleted on JVM shutdown.
+
+  Supported arguments are the same as for me.raynes.fs/temp-file:
+  [prefix]
+  [prefix suffix]
+  [prefix suffix tries]
+
+  You may also call with no arguments, in which case the prefix string will be
+  empty."
+  [& args]
+  (if (empty? args)
+    (delete-on-exit (fs/temp-file nil))
+    (delete-on-exit (apply fs/temp-file args))))
+
+(defn temp-dir
+  "Creates a temporary directory that will be deleted on JVM shutdown.
+
+  Supported arguments are the same as for me.raynes.fs/temp-dir:
+  [prefix]
+  [prefix suffix]
+  [prefix suffix tries]
+
+  You may also call with no arguments, in which case the prefix string will be
+  empty."
+  [& args]
+  temp-dir
+  (if (empty? args)
+    (delete-on-exit (fs/temp-dir nil))
+    (delete-on-exit (apply fs/temp-dir args))))
 
 ;; ## Configuration files
 

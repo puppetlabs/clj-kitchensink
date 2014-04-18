@@ -1,10 +1,10 @@
 (ns puppetlabs.kitchensink.core-test
-  (:require [fs.core :as fs]
+  (:require [clojure.test :refer :all]
+            [puppetlabs.kitchensink.core :refer :all]
+            [me.raynes.fs :as fs]
             [slingshot.slingshot :refer [try+]]
             [clojure.string :as string]
-            [puppetlabs.kitchensink.testutils :as testutils])
-  (:use [puppetlabs.kitchensink.core]
-        [clojure.test]))
+            [puppetlabs.kitchensink.testutils :as testutils]))
 
 (deftest array?-test
   (testing "array?"
@@ -275,10 +275,29 @@
       (is (= "8843d7f92416211de9ebb963ff4ce28125932878"
             (utf8-string->sha1 "foobar"))))))
 
+(deftest temp-file-test
+  (testing "should create a temp file when not given a prefix"
+    (let [f (temp-file)]
+      (is (fs/file? f))))
+  (testing "should create a temp file when given a prefix and suffix"
+    (let [f (temp-file "foo" ".bar")]
+      (is (fs/file? f))
+      (is (.startsWith (.getName f) "foo"))
+      (is (.endsWith (.getName f) ".bar"))))
+  (testing "should create a temp dir when not given a prefix"
+    (let [d (temp-dir)]
+      (is (fs/directory? d))))
+  (testing "should create a temp dir when given a prefix and suffix"
+    (let [d (temp-dir "foo" ".bar")]
+      (is (fs/directory? d))
+      (is (.startsWith (.getName d) "foo"))
+      (is (.endsWith (.getName d) ".bar")))))
+
+
 (deftest ini-parsing
   (testing "Parsing ini files"
     (testing "should work for a single file"
-      (let [tf (testutils/temp-file)]
+      (let [tf (temp-file)]
         (spit tf "[foo]\nbar=baz")
 
         (testing "when specified as a file object"
@@ -290,18 +309,18 @@
                 {:foo {:bar "baz"}})))))
 
     (testing "should work for a directory"
-      (let [td (testutils/temp-dir)]
+      (let [td (temp-dir)]
         (testing "when no matching files exist"
           (is (= (inis-to-map td) {})))
 
-        (let [tf (testutils/temp-file "a-test" ".ini" td)]
+        (let [tf (fs/file td "a-test.ini")]
           (spit tf "[foo]\nbar=baz"))
 
         (testing "when only a single matching file exists"
           (is (= (inis-to-map td)
                 {:foo {:bar "baz"}})))
 
-        (let [tf (testutils/temp-file "b-test" ".ini" td)]
+        (let [tf (fs/file td "b-test.ini")]
           ;; Now add a second file
           (spit tf "[bar]\nbar=baz"))
 
@@ -406,7 +425,7 @@
             (cn-whitelist->authorizer "/this/does/not/exist"))))
 
     (testing "when whitelist is present"
-      (let [whitelist (testutils/temp-file)]
+      (let [whitelist (temp-file)]
         (spit whitelist "foo\nbar\n")
 
         (let [authorized? (cn-whitelist->authorizer whitelist)]
@@ -500,14 +519,14 @@
             (keys))))))
 
 (deftest test-spit-ini
-  (let [tf (testutils/temp-file)]
+  (let [tf (temp-file)]
     (spit tf "[foo]\nbar=baz\n[bar]\nfoo=baz")
     (let [ini-map (ini-to-map tf)]
       (is (= ini-map
             {:foo {:bar "baz"}
              :bar {:foo "baz"}}))
       (testing "changing existing keys"
-        (let [result-file (testutils/temp-file)]
+        (let [result-file (temp-file)]
           (spit-ini result-file (-> ini-map
                                   (assoc-in [:foo :bar] "baz changed")
                                   (assoc-in [:bar :foo] "baz also changed")))
@@ -515,7 +534,7 @@
                   :bar {:foo "baz also changed"}}
                 (ini-to-map result-file)))))
       (testing "adding a new section to an existing ini"
-        (let [result-file (testutils/temp-file)]
+        (let [result-file (temp-file)]
           (spit-ini result-file (assoc-in ini-map [:baz :foo] "bar"))
           (is (= {:foo {:bar "baz"}
                   :bar {:foo "baz"}
@@ -524,16 +543,16 @@
 
 (deftest duplicate-ini-entries
   (testing "duplicate settings"
-    (let [tempfile (testutils/temp-file)]
+    (let [tempfile (temp-file)]
       (spit tempfile "[foo]\nbar=baz\nbar=bizzle\n")
       (is (thrown-with-msg?
             IllegalArgumentException
             #"Duplicate configuration entry: \[:foo :bar\]"
             (ini-to-map tempfile))))
 
-    (let [tempdir   (testutils/temp-dir)
-          tempfile1 (testutils/temp-file "initest" ".ini" tempdir)
-          tempfile2 (testutils/temp-file "initest" ".ini" tempdir)]
+    (let [tempdir   (temp-dir)
+          tempfile1 (fs/file tempdir "initest1.ini")
+          tempfile2 (fs/file tempdir "initest2.ini")]
       (spit tempfile1 "[foo]\nsetting1=hi\nbar=baz\n")
       (spit tempfile2 "[foo]\nsetting2=hi\nbar=bizzle\n")
       (is (thrown-with-msg?
@@ -542,9 +561,9 @@
             (inis-to-map tempdir)))))
 
   (testing "duplicate sections but no duplicate settings"
-    (let [tempdir   (testutils/temp-dir)
-          tempfile1 (testutils/temp-file "initest" ".ini" tempdir)
-          tempfile2 (testutils/temp-file "initest" ".ini" tempdir)]
+    (let [tempdir   (temp-dir)
+          tempfile1 (fs/file tempdir "initest1.ini")
+          tempfile2 (fs/file tempdir "initest.ini")]
       (spit tempfile1 "[foo]\nsetting1=hi\nbar=baz\n")
       (spit tempfile2 "[foo]\nsetting2=hi\nbunk=bizzle\n")
       (is (= {:foo {:setting1 "hi"

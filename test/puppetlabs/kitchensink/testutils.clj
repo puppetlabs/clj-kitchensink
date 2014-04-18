@@ -1,5 +1,5 @@
 (ns puppetlabs.kitchensink.testutils
-  (:require [fs.core :as fs]
+  (:require [me.raynes.fs :as fs]
             [puppetlabs.kitchensink.core :as ks]))
 
 (defn call-counter
@@ -22,20 +22,6 @@
   invoked."
   [f]
   (deref (:ncalls (meta f))))
-
-(defn delete-on-exit
-  "Will delete `f` on shutdown of the JVM"
-  [f]
-  (.deleteOnExit (fs/file f))
-  f)
-
-(def ^{:doc "Creates a temporary file that will be deleted on JVM shutdown."}
-  temp-file
-  (comp delete-on-exit fs/temp-file))
-
-(def ^{:doc "Creates a temporary directory that will be deleted on JVM shutdown."}
-  temp-dir
-  (comp delete-on-exit fs/temp-dir))
 
 (defmacro with-no-jvm-shutdown-hooks
   [& body]
