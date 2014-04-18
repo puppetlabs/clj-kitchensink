@@ -23,27 +23,6 @@
   [f]
   (deref (:ncalls (meta f))))
 
-(defn delete-on-exit
-  "Will delete `f` on shutdown of the JVM"
-  [f]
-  (.deleteOnExit (fs/file f))
-  f)
-
-(defn temp-file
-  "Creates a temporary file that will be deleted on JVM shutdown."
-  [& args]
-  (if (empty? args)
-    (delete-on-exit (fs/temp-file nil))
-    (delete-on-exit (apply fs/temp-file args))))
-
-(defn temp-dir
-  "Creates a temporary directory that will be deleted on JVM shutdown."
-  [& args]
-  temp-dir
-  (if (empty? args)
-    (delete-on-exit (fs/temp-dir nil))
-    (delete-on-exit (apply fs/temp-dir args))))
-
 (defmacro with-no-jvm-shutdown-hooks
   [& body]
   `(with-redefs [ks/add-shutdown-hook! (fn [_#] nil)]

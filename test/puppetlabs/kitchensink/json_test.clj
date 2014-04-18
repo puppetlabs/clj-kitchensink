@@ -3,7 +3,7 @@
             [clj-time.core :as clj-time]
             [clojure.tools.logging :as log]
             [me.raynes.fs :as fs]
-            [puppetlabs.kitchensink.testutils :refer [temp-file]])
+            [puppetlabs.kitchensink.core :refer [temp-file]])
   (:import (java.io StringWriter StringReader))
   (:use clojure.test
         puppetlabs.kitchensink.json))

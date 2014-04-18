@@ -1,10 +1,10 @@
 (ns puppetlabs.kitchensink.core-test
-  (:require [me.raynes.fs :as fs]
+  (:require [clojure.test :refer :all]
+            [puppetlabs.kitchensink.core :refer :all]
+            [me.raynes.fs :as fs]
             [slingshot.slingshot :refer [try+]]
             [clojure.string :as string]
-            [puppetlabs.kitchensink.testutils :as testutils])
-  (:use [puppetlabs.kitchensink.core]
-        [clojure.test]))
+            [puppetlabs.kitchensink.testutils :as testutils]))
 
 (deftest array?-test
   (testing "array?"
@@ -245,7 +245,7 @@
 (deftest ini-parsing
   (testing "Parsing ini files"
     (testing "should work for a single file"
-      (let [tf (testutils/temp-file)]
+      (let [tf (temp-file)]
         (spit tf "[foo]\nbar=baz")
 
         (testing "when specified as a file object"
@@ -257,7 +257,7 @@
                 {:foo {:bar "baz"}})))))
 
     (testing "should work for a directory"
-      (let [td (testutils/temp-dir)]
+      (let [td (temp-dir)]
         (testing "when no matching files exist"
           (is (= (inis-to-map td) {})))
 
@@ -373,7 +373,7 @@
             (cn-whitelist->authorizer "/this/does/not/exist"))))
 
     (testing "when whitelist is present"
-      (let [whitelist (testutils/temp-file)]
+      (let [whitelist (temp-file)]
         (spit whitelist "foo\nbar\n")
 
         (let [authorized? (cn-whitelist->authorizer whitelist)]
@@ -467,14 +467,14 @@
             (keys))))))
 
 (deftest test-spit-ini
-  (let [tf (testutils/temp-file)]
+  (let [tf (temp-file)]
     (spit tf "[foo]\nbar=baz\n[bar]\nfoo=baz")
     (let [ini-map (ini-to-map tf)]
       (is (= ini-map
             {:foo {:bar "baz"}
              :bar {:foo "baz"}}))
       (testing "changing existing keys"
-        (let [result-file (testutils/temp-file)]
+        (let [result-file (temp-file)]
           (spit-ini result-file (-> ini-map
                                   (assoc-in [:foo :bar] "baz changed")
                                   (assoc-in [:bar :foo] "baz also changed")))
@@ -482,7 +482,7 @@
                   :bar {:foo "baz also changed"}}
                 (ini-to-map result-file)))))
       (testing "adding a new section to an existing ini"
-        (let [result-file (testutils/temp-file)]
+        (let [result-file (temp-file)]
           (spit-ini result-file (assoc-in ini-map [:baz :foo] "bar"))
           (is (= {:foo {:bar "baz"}
                   :bar {:foo "baz"}
@@ -491,14 +491,14 @@
 
 (deftest duplicate-ini-entries
   (testing "duplicate settings"
-    (let [tempfile (testutils/temp-file)]
+    (let [tempfile (temp-file)]
       (spit tempfile "[foo]\nbar=baz\nbar=bizzle\n")
       (is (thrown-with-msg?
             IllegalArgumentException
             #"Duplicate configuration entry: \[:foo :bar\]"
             (ini-to-map tempfile))))
 
-    (let [tempdir   (testutils/temp-dir)
+    (let [tempdir   (temp-dir)
           tempfile1 (fs/file tempdir "initest1.ini")
           tempfile2 (fs/file tempdir "initest2.ini")]
       (spit tempfile1 "[foo]\nsetting1=hi\nbar=baz\n")
@@ -509,7 +509,7 @@
             (inis-to-map tempdir)))))
 
   (testing "duplicate sections but no duplicate settings"
-    (let [tempdir   (testutils/temp-dir)
+    (let [tempdir   (temp-dir)
           tempfile1 (fs/file tempdir "initest1.ini")
           tempfile2 (fs/file tempdir "initest.ini")]
       (spit tempfile1 "[foo]\nsetting1=hi\nbar=baz\n")

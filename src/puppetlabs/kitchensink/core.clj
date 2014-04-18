@@ -449,6 +449,29 @@
      (catch Throwable e#
        (deliver ~error e#))))
 
+;; ## Temp files
+
+(defn delete-on-exit
+  "Will delete `f` on shutdown of the JVM"
+  [f]
+  (.deleteOnExit (fs/file f))
+  f)
+
+(defn temp-file
+  "Creates a temporary file that will be deleted on JVM shutdown."
+  [& args]
+  (if (empty? args)
+    (delete-on-exit (fs/temp-file nil))
+    (delete-on-exit (apply fs/temp-file args))))
+
+(defn temp-dir
+  "Creates a temporary directory that will be deleted on JVM shutdown."
+  [& args]
+  temp-dir
+  (if (empty? args)
+    (delete-on-exit (fs/temp-dir nil))
+    (delete-on-exit (apply fs/temp-dir args))))
+
 ;; ## Configuration files
 
 (def keywordize
