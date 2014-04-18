@@ -458,14 +458,30 @@
   f)
 
 (defn temp-file
-  "Creates a temporary file that will be deleted on JVM shutdown."
+  "Creates a temporary file that will be deleted on JVM shutdown.
+
+  Supported arguments are the same as for me.raynes.fs/temp-file:
+  [prefix]
+  [prefix suffix]
+  [prefix suffix tries]
+
+  You may also call with no arguments, in which case the prefix string will be
+  empty."
   [& args]
   (if (empty? args)
     (delete-on-exit (fs/temp-file nil))
     (delete-on-exit (apply fs/temp-file args))))
 
 (defn temp-dir
-  "Creates a temporary directory that will be deleted on JVM shutdown."
+  "Creates a temporary directory that will be deleted on JVM shutdown.
+
+  Supported arguments are the same as for me.raynes.fs/temp-dir:
+  [prefix]
+  [prefix suffix]
+  [prefix suffix tries]
+
+  You may also call with no arguments, in which case the prefix string will be
+  empty."
   [& args]
   temp-dir
   (if (empty? args)

@@ -242,6 +242,25 @@
       (is (= "8843d7f92416211de9ebb963ff4ce28125932878"
             (utf8-string->sha1 "foobar"))))))
 
+(deftest temp-file-test
+  (testing "should create a temp file when not given a prefix"
+    (let [f (temp-file)]
+      (is (fs/file? f))))
+  (testing "should create a temp file when given a prefix and suffix"
+    (let [f (temp-file "foo" ".bar")]
+      (is (fs/file? f))
+      (is (.startsWith (.getName f) "foo"))
+      (is (.endsWith (.getName f) ".bar"))))
+  (testing "should create a temp dir when not given a prefix"
+    (let [d (temp-dir)]
+      (is (fs/directory? d))))
+  (testing "should create a temp dir when given a prefix and suffix"
+    (let [d (temp-dir "foo" ".bar")]
+      (is (fs/directory? d))
+      (is (.startsWith (.getName d) "foo"))
+      (is (.endsWith (.getName d) ".bar")))))
+
+
 (deftest ini-parsing
   (testing "Parsing ini files"
     (testing "should work for a single file"
