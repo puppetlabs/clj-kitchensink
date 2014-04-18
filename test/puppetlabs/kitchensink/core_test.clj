@@ -81,7 +81,7 @@
           (is (= :io-error (without-ns (:type m))))
           (is (contains? m :message))
           (is (re-find #"foo/bar' is a file" (:message m)))))))
-  (testing "Permission denied on some directory in the heirarchy"
+  (testing "Permission denied on some directory in the hierarchy"
     (let [tmpdir (testutils/temp-dir)]
       (fs/mkdirs (fs/file tmpdir "foo"))
       (fs/chmod "-w" (fs/file tmpdir "foo"))
