@@ -1,3 +1,8 @@
+## 0.7.0
+* Upgrade fs dependency to 1.4.5 (to standardize across projects)
+* Add mkdirs! function to create parent directories with better failure reporting
+* Move temp file functions from testutils to core
+
 ## 0.6.0
 * Remove SSL utility code, which is now available in [puppetlabs/certificate-authority](https://github.com/puppetlabs/jvm-certificate-authority).
 
