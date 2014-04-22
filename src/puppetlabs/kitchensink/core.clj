@@ -725,9 +725,16 @@
 
 
 ;; ## SSL Certificate handling
+;;
+;; NOTE: Prefer functions provided by the jvm-certificate-authority library over these.
+;;
+;; These functions are only used by PuppetDB and they should likely move back into that
+;; project until they can be refactored away over functions from the jvm-ca library.
 
 (defn cn-for-dn
-  "Extracts the CN (common name) from an LDAP DN (distinguished name).
+  "Deprecated. Use functions from `jvm-certificate-authority`.
+
+  Extracts the CN (common name) from an LDAP DN (distinguished name).
 
   If more than one CN entry exists in the given DN, we return the most-specific
   one (the one that comes last, textually). If no CN is present in the DN, we
@@ -754,7 +761,9 @@
     (str)))
 
 (defn cn-for-cert
-  "Extract the CN from the DN of an x509 certificate. See `cn-for-dn` for details
+  "Deprecated. Use functions from `jvm-certificate-authority`.
+
+  Extract the CN from the DN of an x509 certificate. See `cn-for-dn` for details
   on how extraction is performed.
 
   If no CN exists in the certificate DN, nil is returned."
