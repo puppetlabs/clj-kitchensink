@@ -51,6 +51,30 @@
   (testing "should return false for an invalid integer")
   (is (not (datetime? -9999999999999999999999999999999))))
 
+(deftest to-bool-test
+  (testing "should return the same value when passed a Boolean"
+    (is (true? (to-bool true)))
+    (is (false? (to-bool false))))
+  (testing "should return true or false when passed a string representation of same"
+    (is (true? (to-bool "true")))
+    (is (true? (to-bool "TRUE")))
+    (is (true? (to-bool "tRuE")))
+    (is (false? (to-bool "false")))
+    (is (false? (to-bool "FALSE")))
+    (is (false? (to-bool "fAlSe"))))
+  (testing "should return false when passed nil"
+    (is (false? (to-bool nil))))
+  (testing "should throw an exception when passed a string other than true or false"
+    (try+
+      (to-bool "hi")
+      (is (not true) "Expected exception to be thrown by to-bool when an invalid string is passed")
+      (catch map? m
+        (is (contains? m :type))
+        (is (= :puppetlabs.kitchensink.core/parse-error (:type m)))
+        (is (= :parse-error (without-ns (:type m))))
+        (is (contains? m :message))
+        (is (re-find #"Unable to parse 'hi' to a boolean" (:message m)))))))
+
 (deftest test-true-str?
   (are [t-or-f? str-val] (t-or-f? (true-str? str-val))
 
