@@ -133,21 +133,28 @@
   [path]
   {:pre [((some-fn #(instance? File %) string?) path)]
    :post [(fs/directory? path)]}
-  (doseq [dir (reverse (cons path (fs/parents path)))]
-    (when-not (fs/exists? dir)
-      (let [parent (.getParentFile dir)]
-        (when (fs/file? parent)
-          (throw+ {:type ::io-error
-                   :message (format "Parent directory '%s' is a file" parent)}))
+  (let [path-as-file (fs/file path)]
+    (if (fs/file? path-as-file)
+      (throw+ {:type    ::io-error
+               :message (format "Path '%s' is a file" path)})
+      (doseq [dir (reverse (cons path-as-file (fs/parents path-as-file)))]
+        (when-not (fs/exists? dir)
+          (let [parent (.getParentFile dir)]
+            (when (fs/file? parent)
+              (throw+ {:type ::io-error
+                       :message (format "Parent directory '%s' is a file"
+                                        parent)}))
 
-        (when-not (.canWrite parent)
-          (throw+ {:type ::io-error
-                   :message (format "Parent directory '%s' is not writable" parent)}))
+            (when-not (.canWrite parent)
+              (throw+ {:type ::io-error
+                       :message (format "Parent directory '%s' is not writable"
+                                        parent)}))
 
-        (let [success (.mkdir dir)]
-          (when-not success
-            (throw {:type ::io-error
-                    :message (format "Unable to create directory '%s'" parent)})))))))
+            (let [success (.mkdir dir)]
+              (when-not success
+                (throw {:type ::io-error
+                        :message (format "Unable to create directory '%s'"
+                                         parent)})))))))))
 
 ;; ## Math
 
