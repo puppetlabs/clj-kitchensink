@@ -152,9 +152,9 @@
 
             (let [success (.mkdir dir)]
               (when-not success
-                (throw {:type ::io-error
-                        :message (format "Unable to create directory '%s'"
-                                         parent)})))))))))
+                (throw+ {:type ::io-error
+                         :message (format "Unable to create directory '%s'"
+                                          parent)})))))))))
 
 ;; ## Math
 
