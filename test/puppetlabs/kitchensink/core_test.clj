@@ -87,10 +87,15 @@
                          false? "FALSE"))
 
 (deftest mkdirs-test
-  (testing "creates all specified directories that don't exist"
+  (testing "creates all specified directories that don't exist for File arg"
     (let [tmpdir (temp-dir)]
       (fs/mkdirs (fs/file tmpdir "foo"))
       (mkdirs! (fs/file tmpdir "foo" "bar" "baz"))
+      (is (fs/directory? (fs/file tmpdir "foo" "bar" "baz")))))
+  (testing "creates all specified directories that don't exist for String arg"
+    (let [tmpdir (temp-dir)]
+      (fs/mkdirs (fs/file tmpdir "foo"))
+      (mkdirs! (.getPath (fs/file tmpdir "foo" "bar" "baz")))
       (is (fs/directory? (fs/file tmpdir "foo" "bar" "baz")))))
   (testing "throws exception if one of the elements of the path exists and is a file"
     (let [tmpdir (temp-dir)]
@@ -99,6 +104,20 @@
       (try+
         (mkdirs! (fs/file tmpdir "foo" "bar" "baz"))
         (is (not true) "Expected exception to be thrown by mkdirs! when one of the elements of the path already exists and is a file")
+        (catch map? m
+          (is (contains? m :type))
+          (is (= :puppetlabs.kitchensink.core/io-error (:type m)))
+          (is (= :io-error (without-ns (:type m))))
+          (is (contains? m :message))
+          (is (re-find #"foo/bar' is a file" (:message m)))))))
+  (testing "throws exception if the path exists and is a file"
+    (let [tmpdir (temp-dir)]
+      (fs/mkdirs (fs/file tmpdir "foo"))
+      (fs/touch (fs/file tmpdir "foo" "bar"))
+      (try+
+        (mkdirs! (fs/file tmpdir "foo" "bar"))
+        (is (not true) (str "Expected exception to be thrown by mkdirs! when "
+                            "the path already exists and is a file"))
         (catch map? m
           (is (contains? m :type))
           (is (= :puppetlabs.kitchensink.core/io-error (:type m)))
