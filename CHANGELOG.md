@@ -1,4 +1,5 @@
 ## 0.7.2
+* Change `mkdirs!` to allow string as path arg (7097bb3)
 * Add a new `dissoc-in` function, for removing data from nested maps.
 
 ## 0.7.1
