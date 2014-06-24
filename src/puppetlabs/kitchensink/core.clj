@@ -297,6 +297,17 @@
         (recur ret (first ks) (next ks))
         ret))))
 
+(defn dissoc-in
+  "Dissociates an entry from a nested map. ks is a sequence of keys. Any empty maps that result
+  will not be present in the new map."
+  [m [k & ks]]
+  (when m
+    (if-let [res (and ks (dissoc-in (m k) ks))]
+      (assoc m k res)
+      (let [res (dissoc m k)]
+        (when-not (empty? res)
+          res)))))
+
 (defn merge-with-key
   "Returns a map that consists of the rest of the maps conj-ed onto
   the first.  If a key `k` occurs in more than one map, the mapping(s)

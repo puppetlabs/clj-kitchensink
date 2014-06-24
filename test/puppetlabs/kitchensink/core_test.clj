@@ -193,6 +193,13 @@
     (testing "should not remove the key if the value is not nil"
       (is (= testmap (dissoc-if-nil testmap :a))))))
 
+(deftest dissoc-in-test
+  (let [testmap {:a {:b 1 :c {:d 2}}}]
+    (testing "should remove the key"
+      (is (= {:a {:c {:d 2}}} (dissoc-in testmap [:a :b]))))
+    (testing "should remove the empty map"
+      (is (= {:a {:b 1}} (dissoc-in testmap [:a :c :d]))))))
+
 (deftest merge-with-key-test
   (let [m1        {:a 1 :b 2}
         m2        {:a 3 :b 4}
