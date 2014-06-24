@@ -1,3 +1,10 @@
+## 0.7.2
+* Add a new `dissoc-in` function, for removing data from nested maps.
+
+## 0.7.1
+* Add a new `to-bool` function, which provides a more tolerant way to coerce
+  data to booleans
+
 ## 0.7.0
 * Upgrade fs dependency to 1.4.5 (to standardize across projects)
 * Add mkdirs! function to create parent directories with better failure reporting
