@@ -7,4 +7,3 @@ jdk:
 script: ./ext/travisci/test.sh
 notifications:
   email: false
-services: postgresql
