@@ -3,6 +3,12 @@
 A library of utility functions that are common to several Puppet Labs
 clojure projects.
 
+## Installation
+
+Add the following dependency to your `project.clj` file:
+
+[![Clojars Project](http://clojars.org/puppetlabs/kitchensink/latest-version.svg)](http://clojars.org/puppetlabs/kitchensink)
+
 ## Using Our Test Utils
 
 Kitchensink provides [utility code](./test/puppetlabs/kitchensink/) for use in tests.
