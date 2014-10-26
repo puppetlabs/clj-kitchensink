@@ -383,6 +383,19 @@
   "Returns the sequence of values from the map for the entries with the specified keys"
   (comp vals select-keys))
 
+(defn filter-map
+  "Like 'filter', but works on maps.  Returns a map containing the
+  key-value pairs in 'm' for which 'pred' returns a truth-y value.
+  'pred' must be a function which takes two arguments."
+  [pred m]
+  (reduce
+    (fn [result [key value]]
+      (if (pred key value)
+        (assoc result key value)
+        result))
+    {}
+    m))
+
 (defn missing?
   "Inverse of contains? that supports multiple keys. Will return true if all items are
   missing from the collection, false otherwise.
