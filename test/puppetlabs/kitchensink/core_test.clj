@@ -229,6 +229,22 @@
                          v2))]
       (is (= {:a {:b 4 :c 4}} (deep-merge-with-keys merge-fn m1 m2))))))
 
+(deftest filter-map-test
+  (testing "should filter based on a given predicate"
+    (let [test-map {:dog 5 :cat 4 :mouse 7 :cow 6}]
+      (is (= (filter-map (fn [k v] (even? v)) test-map)
+             {:cat 4, :cow 6}))
+      (is (= (filter-map (fn [k v] (= 3 (count (name k)))) test-map)
+             {:dog 5, :cat 4, :cow 6}))
+      (is (= (filter-map (fn [k v] (and (= 3 (count (name k))) (> v 5))) test-map)
+             {:cow 6}))
+      (is (= (filter-map (fn [k v] true) test-map)
+             test-map))
+      (is (= (filter-map (fn [k v] false) test-map)
+             {}))))
+  (testing "should return empty map if given nil"
+    (is (= {} (filter-map nil nil)))))
+
 (deftest missing?-test
   (let [sample {:a "asdf" :b "asdf" :c "asdf"}]
     (testing "should return true for single key items if they don't exist in the coll"
