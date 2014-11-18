@@ -1,3 +1,7 @@
+## 1.0.0
+* Promoting previous release to 1.0.0 so that we can be more deliberate about
+  adhering to semver from now on.
+
 ## 0.7.3
 * Add 'filter-map' function that can be used to filter maps
 
