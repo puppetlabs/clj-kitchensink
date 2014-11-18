@@ -1,3 +1,6 @@
+## 0.7.3
+* Add 'filter-map' function that can be used to filter maps
+
 ## 0.7.2
 * Change `mkdirs!` to allow string as path arg (7097bb3)
 * Add a new `dissoc-in` function, for removing data from nested maps.
