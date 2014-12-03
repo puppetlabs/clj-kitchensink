@@ -148,6 +148,42 @@
       (is (= 0 (quotient 1 0)))
       (is (= 10 (quotient 1 0 10))))))
 
+(deftest rand-weighted-selection-test
+  (testing "rand-weighted-selection"
+
+    (testing "should make selections within 1% of expected values when n=100k"
+      (let [make-selection #(rand-weighted-selection
+                              0.1 :foo
+                              0.3 :bar
+                              0.4 :baz
+                              0.19 :quux
+                              0.01 :waffle)
+            n (int 1e5)
+            freqs (frequencies (repeatedly n make-selection))
+            expected-freqs {:foo 10000
+                            :bar 30000
+                            :baz 40000
+                            :quux 19000
+                            :waffle 1000}]
+        (doseq [[value actual] freqs
+                :let [expected (get expected-freqs value)]]
+          (is (< (Math/abs (- expected actual)) (/ n 100))))))
+
+    (testing "adjusts the weight of the last value when the weights sum to less than 1"
+      (is (= :foo (rand-weighted-selection 0.0 :foo))))
+
+    (testing "doesn't select values whose weights come after prior weights have sum to 1"
+      (dotimes [_ 1e3]
+        (is (not= :bar (rand-weighted-selection 1.0 :foo 10.0 :bar)))))
+
+    (testing "throws an error when"
+
+      (testing "a weight does not have a value"
+        (is (thrown? AssertionError (rand-weighted-selection 0.0))))
+
+      (testing "a weight is not numeric"
+        (is (thrown? AssertionError (rand-weighted-selection :foo :bar)))))))
+
 (deftest excludes?-test
   (testing "should return true if coll does not contain key"
     (is (excludes? {:foo 1} :bar)))

@@ -198,6 +198,27 @@
    :post [(or (number? %) (nil? %))]}
   ((some-fn parse-int parse-float) s))
 
+;; ## Randomness
+
+(defn rand-weighted-selection
+  "Given alternating numeric weights and values, produces a randomly-selected
+  value according to the weights, which should sum to one.  If the weights sum
+  to less than one, then the last value will have its weight adjusted upwards
+  accordingly. If the weights sum to more than one, then values after the
+  cumulative sum of the weights exceeds one will never be selected."
+  [& weights-and-values]
+  {:pre [(even? (count weights-and-values))
+         (every? number? (take-nth 2 weights-and-values))]}
+  (let [weights (take-nth 2 weights-and-values)
+        values (-> (take-nth 2 (drop 1 weights-and-values)) butlast)
+        cutoffs (-> (reductions + weights) butlast)
+        selected? (let [selected-cutoff (rand)]
+                    #(>= % selected-cutoff))
+        selected (filter (comp selected? first)
+                         (map vector cutoffs values))]
+    (if (empty? selected)
+      (last weights-and-values)
+      (-> (first selected) second))))
 
 ;; ## Collection operations
 
