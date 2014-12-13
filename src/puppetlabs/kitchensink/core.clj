@@ -106,6 +106,33 @@
     (pprint x w)
     (.toString w)))
 
+(defn to-sentence
+  "Join the given strings as they would be listed in a sentence (using an Oxford
+  comma if there are three or more strings).
+  Examples:
+    [\"apple\"] => \"apple\"
+    [\"apple\" \"orange\"] => \"apple and orange\"
+    [\"apple\" \"orange\" \"banana\"] => \"apple, orange, and banana\""
+  [strings]
+  (let [num-strings (count strings)]
+    (cond
+      (empty? strings)
+      ""
+
+      (= num-strings 1)
+      (first strings)
+
+      (= num-strings 2)
+      (str (first strings) " and " (second strings))
+
+      (= num-strings 3)
+      (let [[s0 s1 s2] strings]
+        (str s0 ", " s1 ", and " s2))
+
+      (> num-strings 3)
+      (str (first strings) ", " (to-sentence (rest strings))))))
+
+
 ;; ## I/O
 
 (defn lines

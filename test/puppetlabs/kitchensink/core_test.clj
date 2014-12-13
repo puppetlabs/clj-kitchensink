@@ -86,6 +86,14 @@
                          false? nil
                          false? "FALSE"))
 
+(deftest to-sentence-test
+  (are [coll string] (= string (to-sentence coll))
+       [] ""
+       ["foo"] "foo"
+       ["foo" "bar"] "foo and bar"
+       ["foo" "bar" "baz"] "foo, bar, and baz"
+       ["foo" "bar" "baz" "qux"] "foo, bar, baz, and qux"))
+
 (deftest mkdirs-test
   (testing "creates all specified directories that don't exist for File arg"
     (let [tmpdir (temp-dir)]
