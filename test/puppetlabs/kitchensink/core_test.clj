@@ -4,7 +4,8 @@
             [me.raynes.fs :as fs]
             [slingshot.slingshot :refer [try+]]
             [clojure.string :as string]
-            [puppetlabs.kitchensink.testutils :as testutils]))
+            [puppetlabs.kitchensink.testutils :as testutils])
+  (:import (java.util ArrayList)))
 
 (deftest array?-test
   (testing "array?"
@@ -627,6 +628,16 @@
             (/ 5)
             (assoc {} :a)
             (keys))))))
+
+(deftest while-let-macro
+  (let [counter (atom 0)
+        list (ArrayList.)]
+    (dotimes [_ 5] (.add list "foo"))
+    (let [iter (.iterator list)]
+      (while-let [item (and (.hasNext iter)
+                            (.next iter))]
+        (swap! counter inc)))
+    (is (= 5 @counter))))
 
 (deftest test-spit-ini
   (let [tf (temp-file)]
