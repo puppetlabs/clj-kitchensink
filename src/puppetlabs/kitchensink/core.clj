@@ -956,6 +956,15 @@
            ~expr
            (cond-let ~bindings ~@more))))))
 
+(defmacro while-let
+  "Repeatedly executes body while test expression is true, evaluating the body
+  with binding-form bound to the value of test."
+  [bindings & body]
+  (let [form (first bindings) test (second bindings)]
+    `(loop [~form ~test]
+       (when ~form
+         ~@body
+         (recur ~test)))))
 
 (defmacro some-pred->>
   "When expr does not satisfy pred, threads it into the first form (via ->>),
