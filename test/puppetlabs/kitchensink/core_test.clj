@@ -4,7 +4,8 @@
             [me.raynes.fs :as fs]
             [slingshot.slingshot :refer [try+]]
             [clojure.string :as string]
-            [puppetlabs.kitchensink.testutils :as testutils])
+            [puppetlabs.kitchensink.testutils :as testutils]
+            [clojure.zip :as zip])
   (:import (java.util ArrayList)))
 
 (deftest array?-test
@@ -51,6 +52,16 @@
     (is (datetime? 20)))
   (testing "should return false for an invalid integer")
   (is (not (datetime? -9999999999999999999999999999999))))
+
+(deftest zipper?-test
+  (testing "should return true for zippers"
+    (is (true? (zipper? (zip/vector-zip [:foo :bar])))))
+  (testing "should return false for non-zippers"
+    (is (false? (zipper? "hi")))
+    (is (false? (zipper? 42)))
+    (is (false? (zipper? :foo)))
+    (is (false? (zipper? [:foo :bar])))
+    (is (false? (zipper? {:foo :bar})))))
 
 (deftest to-bool-test
   (testing "should return the same value when passed a Boolean"
