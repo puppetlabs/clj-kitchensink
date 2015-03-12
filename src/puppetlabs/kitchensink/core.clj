@@ -52,6 +52,12 @@
   {:post [(boolean? %)]}
   (instance? java.util.regex.Pattern regexp))
 
+(defn zipper?
+  "Checks to see if the object has zip/make-node metadata on it (confirming it
+to be a zipper."
+  [obj]
+  (contains? (meta obj) :zip/make-node))
+
 ;; ## String utilities
 
 (defn strict-parse-bool
