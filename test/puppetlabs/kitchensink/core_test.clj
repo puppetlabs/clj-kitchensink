@@ -256,6 +256,10 @@
     (testing "should remove the empty map"
       (is (= {:a {:b 1}} (dissoc-in testmap [:a :c :d]))))))
 
+(deftest walk-leaves-test
+  (testing "should apply a function to all of the leaves"
+    (is (= {:a 2 :b {:c 5}} (walk-leaves {:a 1 :b {:c 4}} inc)))))
+
 (deftest merge-with-key-test
   (let [m1        {:a 1 :b 2}
         m2        {:a 3 :b 4}
