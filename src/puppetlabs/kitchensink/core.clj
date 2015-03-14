@@ -362,6 +362,11 @@ to be a zipper."
         (when-not (empty? res)
           res)))))
 
+(defn walk-leaves
+  "Walk a map applying a function to all leaf nodes"
+  [m f]
+  (mapvals #(if (map? %) (walk-leaves % f) (f %)) m))
+
 (defn merge-with-key
   "Returns a map that consists of the rest of the maps conj-ed onto
   the first.  If a key `k` occurs in more than one map, the mapping(s)
