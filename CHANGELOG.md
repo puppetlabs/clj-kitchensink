@@ -1,3 +1,13 @@
+## 1.1.0
+
+* Add new `walk-leaves` function for applying a function to all of the leaf
+  nodes of a map
+* Add new `zipper?` predicate which can be used to assert that an object
+  is a clojure zipper.
+* Add new `while-let` macro
+* Add new `rand-weighted-selection` function
+* Add new `to-sentence` variant of string join
+
 ## 1.0.0
 * Promoting previous release to 1.0.0 so that we can be more deliberate about
   adhering to semver from now on.
