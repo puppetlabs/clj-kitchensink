@@ -401,6 +401,12 @@
       (is (= "8843d7f92416211de9ebb963ff4ce28125932878"
             (utf8-string->sha1 "foobar"))))))
 
+(deftest temp-file-name-test
+  (testing "The file should not exist."
+    (is (not (fs/exists? (temp-file-name "foo")))))
+  (testing "It should be possible to create a file at the given path."
+    (is (fs/create (temp-file-name "foo")))))
+
 (deftest temp-file-test
   (testing "should create a temp file when not given a prefix"
     (let [f (temp-file)]
