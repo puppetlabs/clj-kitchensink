@@ -12,6 +12,7 @@
             [clojure.tools.logging :as log]
             [clojure.string :as string]
             [clojure.tools.cli :as cli]
+            [clojure.java.io :as io]
             [digest]
             [slingshot.slingshot :refer [throw+]]
             [me.raynes.fs :as fs])
@@ -601,6 +602,11 @@ to be a zipper."
        (deliver ~error e#))))
 
 ;; ## Temp files
+
+(defn temp-file-name
+  "Returns a unique name to a temporary file, but does not actually create the file."
+  [file-name-prefix]
+  (io/file (fs/tmpdir) (fs/temp-name file-name-prefix)))
 
 (defn delete-on-exit
   "Will delete `f` on shutdown of the JVM"
