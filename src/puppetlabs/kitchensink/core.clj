@@ -601,6 +601,12 @@ to be a zipper."
      (catch Throwable e#
        (deliver ~error e#))))
 
+(defmacro with-timeout [timeout-s default & body]
+  `(let [f# (future (do ~@body))
+         result# (deref f# (* 1000 ~timeout-s) ~default)]
+     (future-cancel f#)
+     result#))
+
 ;; ## Temp files
 
 (defn temp-file-name

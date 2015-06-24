@@ -713,3 +713,15 @@
                     :setting2 "hi"
                     :bunk     "bizzle"}}
              (inis-to-map tempdir))))))
+
+(deftest timeout-test
+  (let [wait-return (fn [time val] (Thread/sleep time) val)]
+    (testing "with-timeout"
+      (testing "does nothing if the body returns within the limit"
+        (is (= true
+               (with-timeout 1 false
+                 (wait-return 500 true)))))
+      (testing "returns the default value if the body times out"
+        (is (= false
+               (with-timeout 1 false
+                 (wait-return 1005 true))))))))
