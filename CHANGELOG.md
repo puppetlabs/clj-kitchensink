@@ -1,3 +1,10 @@
+## 1.2.0
+
+* Add `temp-file-name` function, which returns a unique name to a temporary file, 
+  but does not actually create the file.
+* Add `with-timeout` macro, which returns a default value if executing an 
+  arbitrary block of code takes longer than a specified timeout.
+
 ## 1.1.0
 
 * Add new `walk-leaves` function for applying a function to all of the leaf
