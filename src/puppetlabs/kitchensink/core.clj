@@ -615,6 +615,13 @@ to be a zipper."
   [path]
   (.getPath (fs/absolute path)))
 
+(defn normalized-path
+  "Replacement for raynes.fs/normalized-path, which was removed in raynes.fs 1.4.6.
+  Returns string representation of absolute path, as opposed to fs/normalized, which
+  returns a File object."
+  [path]
+  (.getPath (fs/normalized path)))
+
 ;; ## Temp files
 
 (defn temp-file-name

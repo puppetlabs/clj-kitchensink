@@ -5,6 +5,7 @@ This is a maintenance / minor feature release.
 * [TK-315](https://tickets.puppetlabs.com/browse/TK-315) - update to latest version
   of `raynes.fs` to reduce downstream dependency conflicts.
 * Add an `absolute-path` fn to replace the one that was removed from raynes.fs
+* Add a `normalized-path` fn to replace the one that was removed from raynes.fs
 
 ## 1.2.0
 
