@@ -12,7 +12,7 @@
                  ;; Logging
                  [org.clojure/tools.logging "0.2.6"]
                  ;; Filesystem utilities
-                 [me.raynes/fs "1.4.5"]
+                 [me.raynes/fs "1.4.6"]
                  ;; Configuration file parsing
                  [org.ini4j/ini4j "0.5.2"]
                  [org.clojure/tools.cli "0.3.0"]

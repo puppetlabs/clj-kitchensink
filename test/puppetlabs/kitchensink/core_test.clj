@@ -437,7 +437,7 @@
                 {:foo {:bar "baz"}})))
 
         (testing "when specified as a string"
-          (is (= (inis-to-map (fs/absolute-path tf))
+          (is (= (inis-to-map (fs/absolute tf))
                 {:foo {:bar "baz"}})))))
 
     (testing "should work for a directory"

@@ -726,7 +726,7 @@ to be a zipper."
                   [path]
                   (fs/glob (fs/file path glob-pattern)))]
       (->> files
-        (map fs/absolute-path)
+        (map fs/absolute)
         (map ini-to-map)
         (apply deep-merge-with-keys
                (fn [ks & _]
