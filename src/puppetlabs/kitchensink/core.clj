@@ -7,7 +7,7 @@
 (ns puppetlabs.kitchensink.core
   (:import [org.ini4j Ini Config]
            [javax.naming.ldap LdapName]
-           [java.io StringWriter Reader IOException File])
+           [java.io StringWriter Reader File])
   (:require [clojure.test]
             [clojure.tools.logging :as log]
             [clojure.string :as string]
@@ -606,6 +606,14 @@ to be a zipper."
          result# (deref f# (* 1000 ~timeout-s) ~default)]
      (future-cancel f#)
      result#))
+
+;; ## File paths
+(defn absolute-path
+  "Replacement for raynes.fs/absolute-path, which was removed in raynes.fs 1.4.6.
+  Returns string representation of absolute path, as opposed to fs/absolute, which
+  returns a File object."
+  [path]
+  (.getPath (fs/absolute path)))
 
 ;; ## Temp files
 
