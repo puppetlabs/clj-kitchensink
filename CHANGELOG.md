@@ -1,9 +1,10 @@
-## 1.2.1
+## 1.3.0
 
-This is a maintenance release.
+This is a maintenance / minor feature release.
 
 * [TK-315](https://tickets.puppetlabs.com/browse/TK-315) - update to latest version
   of `raynes.fs` to reduce downstream dependency conflicts.
+* Add an `absolute-path` fn to replace the one that was removed from raynes.fs
 
 ## 1.2.0
 
