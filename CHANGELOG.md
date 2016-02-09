@@ -1,3 +1,10 @@
+## 1.2.1
+
+This is a maintenance release.
+
+* [TK-315](https://tickets.puppetlabs.com/browse/TK-315) - update to latest version
+  of `raynes.fs` to reduce downstream dependency conflicts.
+
 ## 1.2.0
 
 * Add `temp-file-name` function, which returns a unique name to a temporary file, 
