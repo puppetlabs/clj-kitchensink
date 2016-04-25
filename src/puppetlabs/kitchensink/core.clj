@@ -816,7 +816,7 @@ to be a zipper."
     still invalid in some way."
   ([args specs] (cli! args specs nil))
   ([args specs required-args]
-  (let [specs (conj specs ["-h" "--help" "Show help" :default false :flag true])
+  (let [specs (conj specs ["-h" "--help" "Show help" :default false])
         {:keys [options arguments summary errors]} (cli/parse-opts args specs)]
     (when errors
       (let [msg (str
