@@ -16,11 +16,12 @@
             [clj-time.coerce :as coerce]
             [clj-time.core :as clj-time]
             [clojure.java.io :as io]
-            [clojure.tools.logging :as log]))
+            [clojure.tools.logging :as log])
+  (:import com.fasterxml.jackson.core.JsonGenerator))
 
 (defn- clj-time-encoder
   [data jsonGenerator]
-  (.writeString jsonGenerator (coerce/to-string data)))
+  (.writeString ^JsonGenerator jsonGenerator ^String (coerce/to-string data)))
 
 (def ^:dynamic *datetime-encoder* clj-time-encoder)
 
@@ -86,6 +87,6 @@
   "Similar to clojure.core/spit, but writes the Clojure
    datastructure as JSON to `f`"
   [f obj & options]
-  (with-open [writer (apply io/writer f options)]
+  (with-open [writer ^java.io.BufferedWriter (apply io/writer f options)]
     (generate-pretty-stream obj writer))
   nil)

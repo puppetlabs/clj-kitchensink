@@ -5,7 +5,7 @@
 ;; altogether. But who has time for that?
 
 (ns puppetlabs.kitchensink.core
-  (:import [org.ini4j Ini Config]
+  (:import [org.ini4j Ini Config BasicProfileSection]
            [javax.naming.ldap LdapName]
            [java.io StringWriter Reader File])
   (:require [clojure.test]
@@ -64,7 +64,7 @@ to be a zipper."
 (defn strict-parse-bool
   "Parse a string and return its boolean value; throws an exception if the String
   does not match `\"true\"` or `\"false\"` (case-insensitive)."
-  [s]
+  [^String s]
   {:pre [(string? s)]
    :post [(boolean? %)]}
   (condp = (.toLowerCase s)
@@ -98,7 +98,7 @@ to be a zipper."
 
 (defn string-contains?
   "Returns true if `s` has the `substring` in it"
-  [substring s]
+  [^String substring ^String s]
   {:pre [(string? s)
          (string? substring)]}
   (>= (.indexOf s substring) 0))
@@ -171,7 +171,7 @@ to be a zipper."
     (if (fs/file? path-as-file)
       (throw+ {:type    ::io-error
                :message (format "Path '%s' is a file" path)})
-      (doseq [dir (reverse (cons path-as-file (fs/parents path-as-file)))]
+      (doseq [^File dir (reverse (cons path-as-file (fs/parents path-as-file)))]
         (when-not (fs/exists? dir)
           (let [parent (.getParentFile dir)]
             (when (fs/file? parent)
@@ -613,14 +613,14 @@ to be a zipper."
   Returns string representation of absolute path, as opposed to fs/absolute, which
   returns a File object."
   [path]
-  (.getPath (fs/absolute path)))
+  (.getPath ^File (fs/absolute path)))
 
 (defn normalized-path
   "Replacement for raynes.fs/normalized-path, which was removed in raynes.fs 1.4.6.
   Returns string representation of absolute path, as opposed to fs/normalized, which
   returns a File object."
   [path]
-  (.getPath (fs/normalized path)))
+  (.getPath ^File (fs/normalized path)))
 
 ;; ## Temp files
 
@@ -675,14 +675,14 @@ to be a zipper."
 (defn fetch-int
   "Fetch a key from the INI section and convert it
    to an integer if it parses, otherwise return the string"
-  [section key]
+  [^BasicProfileSection section key]
   (let [val (.fetch section key)]
     (or (parse-int val)
         val)))
 
 (defn create-section-map
   "Given an INI section, create a clojure map of it's key/values"
-  [section]
+  [^BasicProfileSection section]
   (reduce (fn [acc [key _]]
             (if (> (.length section key) 1)
               (throw (IllegalArgumentException.
@@ -696,7 +696,7 @@ to be a zipper."
 (defn parse-ini
   "Takes a reader that contains an ini file, and returns an Ini object
   containing the parsed results"
-  [ini-reader]
+  [^Reader ini-reader]
   {:pre [(instance? Reader ini-reader)]
    :post [(instance? Ini %)]}
   (let [config (Config.)
@@ -753,7 +753,7 @@ to be a zipper."
   "Writes the `ini-map` to the Ini file at `file`. `ini-map` should
    a map similar to the ones created by ini-to-map. The keys are keywords
    for the sections and their values are maps of config keypairs."
-  [file ini-map]
+  [^File file ini-map]
   (let [ini (org.ini4j.Ini. file)]
     (doseq [[section-key section] ini-map
             [k v] section]
@@ -767,7 +767,7 @@ to be a zipper."
   function will be called if the JVM receiveds an interrupt signal (e.g. from
   `kill` or CTRL-C); you can use it to log shutdown messages, handle state
   cleanup, etc."
-  [f]
+  [^Runnable f]
   {:pre [(fn? f)]}
   (.addShutdownHook (Runtime/getRuntime) (Thread. f)))
 
@@ -867,7 +867,7 @@ to be a zipper."
 
       (cn-for-dn \"OU=meh,C=us\")
       nil"
-  [dn]
+  [^String dn]
   {:pre [(string? dn)]}
   (some->> dn
     (LdapName.)
@@ -915,7 +915,7 @@ to be a zipper."
 (defn utf8-string->sha1
   "Compute a SHA-1 hash for the UTF-8 encoded version of the supplied
   string"
-  [s]
+  [^String s]
   {:pre  [(string? s)]
    :post [(string? %)]}
   (let [bytes (.getBytes s "UTF-8")]
