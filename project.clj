@@ -15,7 +15,7 @@
                  [me.raynes/fs "1.4.6"]
                  ;; Configuration file parsing
                  [org.ini4j/ini4j "0.5.2"]
-                 [org.clojure/tools.cli "0.3.0"]
+                 [org.clojure/tools.cli "0.3.3"]
                  ;; This library is used by puppetlabs.kitchensink.classpath
                  ;; to do some classpath stuff.
                  [org.tcrawley/dynapath "0.2.3"]
