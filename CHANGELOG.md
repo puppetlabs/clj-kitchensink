@@ -1,3 +1,11 @@
+## 1.3.1
+
+This is a maintenance release.
+
+* Remove retired :flag option from cli tooling, to eliminate warnings on CLI
+  invocations.
+* Bump to org.clojure/tools.cli 0.3.3.
+
 ## 1.3.0
 
 This is a maintenance / minor feature release.
