@@ -1,4 +1,5 @@
-(ns ^{:doc "Cheshire related functions
+(ns puppetlabs.kitchensink.json
+  "Cheshire related functions
 
   This front-ends the common set of core cheshire functions:
 
@@ -8,11 +9,9 @@
   * parse-stream
 
   This namespace when 'required' will also setup some common JSON encoders
-  globally, so you can avoid doing this for each call."}
-
-  puppetlabs.kitchensink.json
-  (:require [cheshire.generate :as generate]
-            [cheshire.core :as core]
+  globally, so you can avoid doing this for each call."
+  (:require [cheshire.core :as core]
+            [cheshire.generate :as generate]
             [clj-time.coerce :as coerce]
             [clj-time.core :as clj-time]
             [clojure.java.io :as io]
