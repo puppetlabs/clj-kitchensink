@@ -85,8 +85,8 @@
   overrides the classpath to include the specified paths; the original
   classpath is restored prior to returning."
   [jars-and-dirs & body]
-  {:pre [(coll? jars-and-dirs)
-         (every? (partial satisfies? Coercions) jars-and-dirs)]}
+  `{:pre [(coll? ~jars-and-dirs)
+         (every? (partial satisfies? Coercions) ~jars-and-dirs)]}
   `(let [orig-loader# (.. Thread currentThread getContextClassLoader)
          temp-loader# (URLClassLoader.
                         (into-array
