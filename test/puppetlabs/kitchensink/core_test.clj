@@ -256,6 +256,14 @@
     (testing "should remove the empty map"
       (is (= {:a {:b 1}} (dissoc-in testmap [:a :c :d]))))))
 
+(deftest leaves-test
+  (testing "Should return the leaf nodes of a map"
+    (is (= #{'a 'b 'c 'd}
+           (set (leaves {:a 'a
+                         :b 'b
+                         :nested-1 {:c 'c
+                                    :nested-2 {:d 'd}}}))))))
+
 (deftest walk-leaves-test
   (testing "should apply a function to all of the leaves"
     (is (= {:a 2 :b {:c 5}} (walk-leaves {:a 1 :b {:c 4}} inc)))))
