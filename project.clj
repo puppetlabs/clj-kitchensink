@@ -31,9 +31,7 @@
   ;; code that we have.
   :classifiers [["test" :testutils]]
 
-  :profiles {:dev {:dependencies [[spyscope "0.1.4"]]
-                   :injections [(require 'spyscope.core)]}
-             :testutils {:source-paths ^:replace ["test"]}}
+  :profiles {:testutils {:source-paths ^:replace ["test"]}}
 
   ;; this plugin is used by jenkins jobs to interrogate the project version
   :plugins [[lein-project-version "0.1.0"]]
