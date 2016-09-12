@@ -3,27 +3,30 @@
   :license {:name "Apache License, Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
 
+  :min-lein-version "2.7.0"
+
+  :parent-project {:coords [puppetlabs/clj-parent "0.1.0-SNAPSHOT"]
+                   :inherit [:managed-dependencies]}
+
   ;; Abort when version ranges or version conflicts are detected in
   ;; dependencies. Also supports :warn to simply emit warnings.
   ;; requires lein 2.2.0+.
   :pedantic? :abort
 
-  :dependencies [[org.clojure/clojure "1.5.1"]
-                 ;; Logging
-                 [org.clojure/tools.logging "0.2.6"]
-                 ;; Filesystem utilities
-                 [me.raynes/fs "1.4.6"]
-                 ;; Configuration file parsing
+  :dependencies [[org.clojure/clojure]
+                 [org.clojure/tools.logging]
+                 [org.clojure/tools.cli]
+
+                 [clj-time]
+                 [me.raynes/fs]
+                 [slingshot]
+                 [cheshire]
+
                  [org.ini4j/ini4j "0.5.2"]
-                 [org.clojure/tools.cli "0.3.3"]
-                 ;; This library is used by puppetlabs.kitchensink.classpath
-                 ;; to do some classpath stuff.
                  [org.tcrawley/dynapath "0.2.3"]
                  [digest "1.4.3"]
-                 [clj-time "0.5.1"]
-                 [slingshot "0.10.3"]
-                 ;; JSON
-                 [cheshire "5.3.1"]]
+
+                 ]
 
   ;; By declaring a classifier here and a corresponding profile below we'll get an additional jar
   ;; during `lein jar` that has all the code in the test/ directory. Downstream projects can then
@@ -34,7 +37,8 @@
   :profiles {:testutils {:source-paths ^:replace ["test"]}}
 
   ;; this plugin is used by jenkins jobs to interrogate the project version
-  :plugins [[lein-project-version "0.1.0"]]
+  :plugins [[lein-project-version "0.1.0"]
+            [lein-parent "0.3.0"]]
 
   :deploy-repositories [["releases" {:url "https://clojars.org/repo"
                                      :username :env/clojars_jenkins_username
