@@ -944,6 +944,15 @@ to be a zipper."
   []
   (str (java.util.UUID/randomUUID)))
 
+(defn uuid?
+  "Verifies whether a string is a valid UUID"
+  [uuid]
+  (try
+    (java.util.UUID/fromString uuid)
+    true
+    (catch IllegalArgumentException e
+      false)))
+
 ;; ## System interface
 
 (defn num-cpus
