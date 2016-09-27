@@ -614,6 +614,12 @@
         (memoized 3)
         (is (= (testutils/times-called f) 4))))))
 
+(deftest uuid-handling
+  (testing "a generated uuid is a valid uuid"
+    (is (uuid? (uuid))))
+  (testing "a phrase is not a uuid"
+    (is (not (uuid? "Hello World")))))
+
 (deftest jvm-versions
   (testing "comparing same versions should return 0"
     (is (= 0 (compare-jvm-versions "1.7.0_3" "1.7.0_3"))))
