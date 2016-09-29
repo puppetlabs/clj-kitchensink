@@ -5,7 +5,7 @@
 
   :min-lein-version "2.7.0"
 
-  :parent-project {:coords [puppetlabs/clj-parent "0.1.0-SNAPSHOT"]
+  :parent-project {:coords [puppetlabs/clj-parent "0.1.0"]
                    :inherit [:managed-dependencies]}
 
   ;; Abort when version ranges or version conflicts are detected in
@@ -38,7 +38,12 @@
 
   ;; this plugin is used by jenkins jobs to interrogate the project version
   :plugins [[lein-project-version "0.1.0"]
-            [lein-parent "0.3.0"]]
+            ;; using lein-step-parent for now, to workaround Cursive bug.
+            ;; need to switch back to lein-parent once Cursive supports
+            ;; lein 2.7.1 and lein-parent properly. 
+            ;[lein-parent "0.3.1"]
+            [lein-step-parent "0.1.0"]
+]
 
   :deploy-repositories [["releases" {:url "https://clojars.org/repo"
                                      :username :env/clojars_jenkins_username
