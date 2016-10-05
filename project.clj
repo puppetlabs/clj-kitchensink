@@ -1,4 +1,4 @@
-(defproject puppetlabs/kitchensink "1.4.0"
+(defproject puppetlabs/kitchensink "1.4.1-SNAPSHOT"
   :description "Clojure utility functions"
   :license {:name "Apache License, Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
