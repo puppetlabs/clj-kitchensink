@@ -1,3 +1,21 @@
+## 1.4.0
+
+This is a minor feature release, which also includes some bugfixes and maintenance work.
+
+Features:
+
+* Add `uuid?` predicate function for determining whether a string is a valid UUID.
+
+Bug fixes:
+
+* Fix an issue in `with-additional-classpath-entries` wherein it's pre/post-conditions were
+  not handling arguments properly.
+
+Maintenance:
+* Reduce use of reflection
+* Remove unused plugins and jenkins scripts
+* Switch to `lein-parent` for managing dependency versions
+
 ## 1.3.1
 
 This is a maintenance release.

@@ -1,11 +1,11 @@
-(defproject puppetlabs/kitchensink "1.3.2-SNAPSHOT"
+(defproject puppetlabs/kitchensink "1.4.0-SNAPSHOT"
   :description "Clojure utility functions"
   :license {:name "Apache License, Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
 
   :min-lein-version "2.7.1"
 
-  :parent-project {:coords [puppetlabs/clj-parent "0.1.0"]
+  :parent-project {:coords [puppetlabs/clj-parent "0.1.3"]
                    :inherit [:managed-dependencies]}
 
   ;; Abort when version ranges or version conflicts are detected in
