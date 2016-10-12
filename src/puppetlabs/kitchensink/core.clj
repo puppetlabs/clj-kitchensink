@@ -25,6 +25,12 @@
         [clj-time.coerce :only [ICoerce to-date-time]]
         [clj-time.format :only [formatters unparse]]))
 
+
+(defn error-map
+  [kind message]
+  {:kind kind
+   :msg message})
+
 ;; ## Type checking
 
 (defn array?
@@ -70,8 +76,8 @@ to be a zipper."
   (condp = (.toLowerCase s)
     "true" true
     "false" false
-    (throw+ {:type ::parse-error
-             :message (format "Unable to parse '%s' to a boolean" s)})))
+    (throw+ (error-map ::parse-error
+                       (format "Unable to parse '%s' to a boolean" s)))))
 
 (defn parse-bool
   "Parse a string and return its boolean value."
@@ -162,33 +168,33 @@ to be a zipper."
 
   The slingshot exception will look like this:
 
-  `{:type     :puppetlabs.kitchensink.core/io-error
-    :message  \"Parent directory '/foo/bar' is not writable\"}`"
+  `{:kind     :puppetlabs.kitchensink.core/io-error
+    :msg      \"Parent directory '/foo/bar' is not writable\"}`"
   [path]
   {:pre [((some-fn #(instance? File %) string?) path)]
    :post [(fs/directory? path)]}
   (let [path-as-file (fs/file path)]
     (if (fs/file? path-as-file)
-      (throw+ {:type    ::io-error
-               :message (format "Path '%s' is a file" path)})
+      (throw+ (error-map ::io-error
+                         (format "Path '%s' is a file" path)))
       (doseq [^File dir (reverse (cons path-as-file (fs/parents path-as-file)))]
         (when-not (fs/exists? dir)
           (let [parent (.getParentFile dir)]
             (when (fs/file? parent)
-              (throw+ {:type ::io-error
-                       :message (format "Parent directory '%s' is a file"
-                                        parent)}))
+              (throw+ (error-map ::io-error
+                                 (format "Parent directory '%s' is a file"
+                                         parent))))
 
             (when-not (.canWrite parent)
-              (throw+ {:type ::io-error
-                       :message (format "Parent directory '%s' is not writable"
-                                        parent)}))
+              (throw+ (error-map ::io-error
+                                 (format "Parent directory '%s' is not writable"
+                                         parent))))
 
             (let [success (.mkdir dir)]
               (when-not success
-                (throw+ {:type ::io-error
-                         :message (format "Unable to create directory '%s'"
-                                          parent)})))))))))
+                (throw+ (error-map ::io-error
+                                   (format "Unable to create directory '%s'"
+                                           parent)))))))))))
 
 ;; ## Math
 
@@ -805,7 +811,7 @@ to be a zipper."
                the program to exit and display the help message.
 
   ** The map is thrown using 'slingshot' (https://github.com/scgilardi/slingshot).
-  It contains a `:type` and `:message`, where type is either `:error` or `:help`,
+  It contains a `:kind` and `:msg`, where type is either `:error` or `:help`,
   and the message is either the error message or a help banner.
 
   Returns a three-item vector, containing:
@@ -825,19 +831,16 @@ to be a zipper."
                   (apply str errors)
                   "\n\n"
                   summary)]
-        (throw+ {:type ::cli-error
-                 :message msg})))
+        (throw+ (error-map ::cli-error msg))))
     (when (:help options)
-      (throw+ {:type ::cli-help
-               :message summary}))
+      (throw+ (error-map ::cli-help summary)))
     (when-let [missing-field (some #(if (not (contains? options %)) %) required-args)]
       (let [msg (str
                   "\n\n"
                   (format "Missing required argument '--%s'!" (name missing-field))
                   "\n\n"
                   summary)]
-        (throw+ {:type ::cli-error
-                 :message msg})))
+        (throw+ (error-map ::cli-error msg))))
     [options arguments summary])))
 
 
