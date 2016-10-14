@@ -81,11 +81,11 @@
       (to-bool "hi")
       (is (not true) "Expected exception to be thrown by to-bool when an invalid string is passed")
       (catch map? m
-        (is (contains? m :type))
-        (is (= :puppetlabs.kitchensink.core/parse-error (:type m)))
-        (is (= :parse-error (without-ns (:type m))))
-        (is (contains? m :message))
-        (is (re-find #"Unable to parse 'hi' to a boolean" (:message m)))))))
+        (is (contains? m :kind))
+        (is (= :puppetlabs.kitchensink.core/parse-error (:kind m)))
+        (is (= :parse-error (without-ns (:kind m))))
+        (is (contains? m :msg))
+        (is (re-find #"Unable to parse 'hi' to a boolean" (:msg m)))))))
 
 (deftest test-true-str?
   (are [t-or-f? str-val] (t-or-f? (true-str? str-val))
@@ -125,11 +125,11 @@
         (mkdirs! (fs/file tmpdir "foo" "bar" "baz"))
         (is (not true) "Expected exception to be thrown by mkdirs! when one of the elements of the path already exists and is a file")
         (catch map? m
-          (is (contains? m :type))
-          (is (= :puppetlabs.kitchensink.core/io-error (:type m)))
-          (is (= :io-error (without-ns (:type m))))
-          (is (contains? m :message))
-          (is (re-find #"foo/bar' is a file" (:message m)))))))
+          (is (contains? m :kind))
+          (is (= :puppetlabs.kitchensink.core/io-error (:kind m)))
+          (is (= :io-error (without-ns (:kind m))))
+          (is (contains? m :msg))
+          (is (re-find #"foo/bar' is a file" (:msg m)))))))
   (testing "throws exception if the path exists and is a file"
     (let [tmpdir (temp-dir)]
       (fs/mkdirs (fs/file tmpdir "foo"))
@@ -139,11 +139,11 @@
         (is (not true) (str "Expected exception to be thrown by mkdirs! when "
                             "the path already exists and is a file"))
         (catch map? m
-          (is (contains? m :type))
-          (is (= :puppetlabs.kitchensink.core/io-error (:type m)))
-          (is (= :io-error (without-ns (:type m))))
-          (is (contains? m :message))
-          (is (re-find #"foo/bar' is a file" (:message m)))))))
+          (is (contains? m :kind))
+          (is (= :puppetlabs.kitchensink.core/io-error (:kind m)))
+          (is (= :io-error (without-ns (:kind m))))
+          (is (contains? m :msg))
+          (is (re-find #"foo/bar' is a file" (:msg m)))))))
   (testing "Permission denied on some directory in the hierarchy"
     (let [tmpdir (temp-dir)]
       (fs/mkdirs (fs/file tmpdir "foo"))
@@ -152,11 +152,11 @@
         (mkdirs! (fs/file tmpdir "foo" "bar" "baz"))
         (is (not true) "Expected exception to be thrown by mkdirs! when a permissions error occurs")
         (catch map? m
-          (is (contains? m :type))
-          (is (= :puppetlabs.kitchensink.core/io-error (:type m)))
-          (is (= :io-error (without-ns (:type m))))
-          (is (contains? m :message))
-          (is (re-find #"foo' is not writable" (:message m))))))))
+          (is (contains? m :kind))
+          (is (= :puppetlabs.kitchensink.core/io-error (:kind m)))
+          (is (= :io-error (without-ns (:kind m))))
+          (is (contains? m :msg))
+          (is (re-find #"foo' is not writable" (:msg m))))))))
 
 (deftest quotient-test
   (testing "quotient"
@@ -467,10 +467,10 @@
       (try+
         (cli! [] [["-r" "--required" "A required field"]] [:required])
         (catch map? m
-          (is (contains? m :type))
-          (is (= :puppetlabs.kitchensink.core/cli-error (:type m)))
-          (is (= :cli-error (without-ns (:type m))))
-          (is (contains? m :message))
+          (is (contains? m :kind))
+          (is (= :puppetlabs.kitchensink.core/cli-error (:kind m)))
+          (is (= :cli-error (without-ns (:kind m))))
+          (is (contains? m :msg))
           (reset! got-expected-error true)))
       (is (true? @got-expected-error))))
 
@@ -479,10 +479,10 @@
       (try+
         (cli! ["--help"] [] [])
         (catch map? m
-          (is (contains? m :type))
-          (is (= :puppetlabs.kitchensink.core/cli-help (:type m)))
-          (is (= :cli-help (without-ns (:type m))))
-          (is (contains? m :message))
+          (is (contains? m :kind))
+          (is (= :puppetlabs.kitchensink.core/cli-help (:kind m)))
+          (is (= :cli-help (without-ns (:kind m))))
+          (is (contains? m :msg))
           (reset! got-expected-help true)))
       (is (true? @got-expected-help))))
 
@@ -510,11 +510,11 @@
               args  ["--bar"]]
           (cli! args specs))
         (catch map? m
-          (is (= :puppetlabs.kitchensink.core/cli-error (:type m)))
-          (is (contains? m :message))
+          (is (= :puppetlabs.kitchensink.core/cli-error (:kind m)))
+          (is (contains? m :msg))
           (is (re-find
                 #"Unknown option.*--bar"
-                (m :message)))
+                (m :msg)))
           (reset! got-expected-exception true)))
       (is (true? @got-expected-exception)))))
 
