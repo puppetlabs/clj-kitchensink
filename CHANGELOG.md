@@ -1,3 +1,12 @@
+## 2.0.0
+
+This is a bugfix release which contains one backward incompatible change.
+
+Bug fix:
+
+* Changes all of the maps in various slingshot errors thrown to use `:kind` and `:msg`
+  in place of `:type` and `:message`, respectively.
+
 ## 1.4.0
 
 This is a minor feature release, which also includes some bugfixes and maintenance work.
