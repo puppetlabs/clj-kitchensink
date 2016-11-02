@@ -1025,3 +1025,9 @@ to be a zipper."
     `(let [~g ~expr
            ~@(interleave (repeat g) (map pstep forms))]
        ~g)))
+
+(defn open-port-num
+  "Returns a currently open port number"
+  []
+  (with-open [s (java.net.ServerSocket. 0)]
+    (.getLocalPort s)))
