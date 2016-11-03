@@ -731,3 +731,10 @@
         (is (= false
                (with-timeout 1 false
                  (wait-return 1005 true))))))))
+
+(deftest open-port-num-test
+  (let [port-in-use (open-port-num)]
+    (with-open [s (java.net.ServerSocket. port-in-use)]
+      (let [open-ports (set (take 60000 (repeatedly open-port-num)))]
+        (is (every? pos? open-ports))
+        (is (not (contains? open-ports port-in-use)))))))
