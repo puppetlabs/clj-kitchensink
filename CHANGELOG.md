@@ -1,3 +1,13 @@
+## 2.1.0
+
+This is a minor feature release.
+
+Features:
+
+* Add an `open-port-num` function, which returns a currently open port. Tests
+  that bind services to ports can use this to guard against chance port
+  collisions.
+
 ## 2.0.0
 
 This is a bugfix release which contains one backward incompatible change.
