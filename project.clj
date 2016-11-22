@@ -23,7 +23,7 @@
                  [cheshire]
 
                  [org.ini4j/ini4j "0.5.2"]
-                 [org.tcrawley/dynapath "0.2.3"]
+                 [org.tcrawley/dynapath "0.2.4"]
                  [digest "1.4.3"]
 
                  ]
