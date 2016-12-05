@@ -1031,3 +1031,15 @@ to be a zipper."
   []
   (with-open [s (java.net.ServerSocket. 0)]
     (.getLocalPort s)))
+
+(defmacro assoc-if-new
+  "Assocs the provided values with the corresponding keys if and only
+  if the key is not already present in map."
+  [map key val & kvs]
+  {:pre [(even? (count kvs))]}
+  (let [deferred-kvs (vec (for [[k v] (cons [key val] (partition 2 kvs))]
+                            [k `(fn [] ~v)]))]
+    `(let [updates# (for [[k# v#] ~deferred-kvs
+                          :when (= ::not-found (get ~map k# ::not-found))]
+                      [k# (v#)])]
+       (merge ~map (into {} updates#)))))
