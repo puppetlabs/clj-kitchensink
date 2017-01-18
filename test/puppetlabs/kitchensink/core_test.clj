@@ -738,3 +738,16 @@
       (let [open-ports (set (take 60000 (repeatedly open-port-num)))]
         (is (every? pos? open-ports))
         (is (not (contains? open-ports port-in-use)))))))
+
+(deftest assoc-if-new-test
+  (testing "assoc-if-new assocs appropriately"
+    (is (= {:a "foo"}
+           (assoc-if-new {:a "foo"} :a "bar")))
+    (is (= {:a "bar" :b "foo"}
+           (assoc-if-new {:b "foo"}  :a "bar")))
+    (is (= {:a "foo" :b "bar"}
+           (assoc-if-new {} :a "foo" :b "bar")))
+    (is (= {:a "foo" :b nil}
+           (assoc-if-new {:b nil} :a "foo" :b "bar")))
+    (is (= {:a "foo" :b "baz"}
+           (assoc-if-new {:b "baz"} :a "foo" :b "bar")))))
