@@ -8,8 +8,7 @@
   (:import [org.ini4j Ini Config BasicProfileSection]
            [javax.naming.ldap LdapName]
            [java.io StringWriter Reader File])
-  (:require [clojure.test]
-            [clojure.tools.logging :as log]
+  (:require [clojure.tools.logging :as log]
             [clojure.string :as string]
             [clojure.tools.cli :as cli]
             [clojure.java.io :as io]
