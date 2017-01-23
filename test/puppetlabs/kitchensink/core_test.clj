@@ -204,6 +204,22 @@
       (testing "a weight is not numeric"
         (is (thrown? AssertionError (rand-weighted-selection :foo :bar)))))))
 
+(deftest rand-str-test
+  (testing "rand-str"
+    (testing "throws an IllegalArgumentException when given an unknown characters keyword"
+      (is (thrown-with-msg? IllegalArgumentException #":CJK" (rand-str :CJK 42))))
+
+    (doseq [[kw cs] ascii-character-sets
+            :let [cs (set cs)]]
+      (testing (str "recognizes the " kw " character set keyword")
+        (dotimes [_ 10]
+          (is (every? cs (rand-str kw 1000))))))
+
+    (testing "uses collections of strings & characters as character sets"
+      (let [as ["a" \a]]
+        (dotimes [_ 100]
+          (is (every? #(= % \a) (rand-str as 100))))))))
+
 (deftest excludes?-test
   (testing "should return true if coll does not contain key"
     (is (excludes? {:foo 1} :bar)))
