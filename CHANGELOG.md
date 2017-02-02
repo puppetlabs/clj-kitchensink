@@ -1,3 +1,18 @@
+## 2.2.0
+
+This is a minor feature release.
+
+Features:
+
+* Add an `assoc-if-new` macro, which associates a map key to a value only if
+  the key does not already exist in the map.
+* Add a `deref-swap!` function, which behaves like deref but returns the old
+  value instead of the new one.
+
+Maintenance:
+
+* Update to dynapath 0.2.5, to address some compatability issues with Java 9.
+
 ## 2.1.0
 
 This is a minor feature release.
