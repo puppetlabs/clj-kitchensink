@@ -1043,3 +1043,14 @@ to be a zipper."
                           :when (= ::not-found (get ~map k# ::not-found))]
                       [k# (v#)])]
        (merge ~map (into {} updates#)))))
+
+(defn deref-swap!
+  "Like swap! but returns the old value.
+   Adapted from http://stackoverflow.com/a/15442107."
+  [atom f & args]
+  (loop []
+    (let [old @atom
+          new (apply f old args)]
+      (if (compare-and-set! atom old new)
+        old
+        (recur)))))

@@ -751,3 +751,10 @@
            (assoc-if-new {:b nil} :a "foo" :b "bar")))
     (is (= {:a "foo" :b "baz"}
            (assoc-if-new {:b "baz"} :a "foo" :b "bar")))))
+
+(deftest deref-swap-test
+  (testing "deref-swap behaves as advertised"
+    (let [a (atom 10)
+          b (deref-swap! a inc)]
+      (is (= 11 @a))
+      (is (= 10 b)))))
