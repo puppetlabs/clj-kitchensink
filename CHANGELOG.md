@@ -8,10 +8,16 @@ Features:
   the key does not already exist in the map.
 * Add a `deref-swap!` function, which behaves like deref but returns the old
   value instead of the new one.
+* Add a `rand-str` function, for generating random strings from various
+  character sets.
 
 Maintenance:
 
 * Update to dynapath 0.2.5, to address some compatability issues with Java 9.
+
+## 2.1.1
+
+The 2.1.1 release was burned and folded into 2.2.0.
 
 ## 2.1.0
 
