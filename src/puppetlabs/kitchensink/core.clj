@@ -8,8 +8,7 @@
   (:import [org.ini4j Ini Config BasicProfileSection]
            [javax.naming.ldap LdapName]
            [java.io StringWriter Reader File])
-  (:require [clojure.test]
-            [clojure.tools.logging :as log]
+  (:require [clojure.tools.logging :as log]
             [clojure.string :as string]
             [clojure.tools.cli :as cli]
             [clojure.java.io :as io]
@@ -259,6 +258,48 @@ to be a zipper."
     (if (empty? selected)
       (last weights-and-values)
       (-> (first selected) second))))
+
+(def ascii-character-sets
+  (let [concatv (comp vec concat)
+        ALPHA (mapv char (range 65 91))
+        alpha (mapv char (range 97 123))
+        digits (mapv char (range 48 58))
+        symbols (concatv (map char (range 33 48))
+                         (map char (range 91 97))
+                         (map char (range 123 127)))]
+    {:alpha (concatv alpha ALPHA)
+     :alpha-lower alpha
+     :alpha-upper ALPHA
+     :alpha-digits (concatv alpha ALPHA digits)
+     :alpha-digits-symbols (concatv alpha ALPHA digits symbols)
+     :symbols symbols
+     :digits digits}))
+
+(defn rand-str
+  "Produces a random string of length n, drawn from the given collection of
+  characters. The following keywords may be used in place of a character
+  collection:
+    :alpha - [a-zA-Z]
+    :alpha-lower - [a-z]
+    :alpha-upper - [A-Z]
+    :alpha-digits - [a-zA-Z0-9]
+    :alpha-digits-symbols - all printable ASCII characters besides space
+    :symbols - all visible, non-alpha-numeric ASCII characters (no space)
+    :digits - [0-9]
+  If no character collection or keyword is provided, :alpha-digits-symbols is
+  used by default."
+  ([n] (rand-str :alpha-digits-symbols n))
+  ([characters n]
+   (let [char-coll (cond
+                     (and (keyword? characters) (contains? ascii-character-sets characters))
+                     (get ascii-character-sets characters)
+
+                     (keyword? characters)
+                     (throw (IllegalArgumentException.
+                              (str characters " is not a recognized character collection keyword")))
+
+                     :else (vec characters))]
+     (apply str (repeatedly n #(rand-nth char-coll))))))
 
 ;; ## Collection operations
 
