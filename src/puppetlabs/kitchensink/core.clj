@@ -20,7 +20,7 @@
         [clojure.string :only (split)]
         [clojure.stacktrace :only (print-cause-trace)]
         [clojure.pprint :only [pprint]]
-        [clj-time.core :only [now]]
+        [clj-time.core :only [now seconds minutes hours days years]]
         [clj-time.coerce :only [ICoerce to-date-time]]
         [clj-time.format :only [formatters unparse]]))
 
@@ -1095,3 +1095,27 @@ to be a zipper."
       (if (compare-and-set! atom old new)
         old
         (recur)))))
+
+(defn parse-interval
+  "Given a time string of the form \"<number>\", or \"<number><unit>\", this
+  function parses this time amount and returns a joda time Period instance.
+  If the unit is left off, the units are assumed to be seconds
+
+  Example: \"12h\" -> (clj-time.core/hours 12)
+  Example: \"12\" -> (clj-time.core/seconds 12)
+
+  Possible units: s(econds), m(inutes), h(ours), d(ays), y(ears)
+
+  Returns nil if the time string cannot be parsed."
+  [time-str]
+  (when-not (nil? time-str)
+    (when-let [[_ num unit] (re-matches #"^(\d+)([smhdy]?)$" time-str)]
+      (let [num (parse-int num)
+            time-fn (case unit
+                      "s" seconds
+                      "m" minutes
+                      "h" hours
+                      "d" days
+                      "y" years
+                      "" seconds)]
+        (time-fn num)))))

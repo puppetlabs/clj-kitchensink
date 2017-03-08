@@ -4,6 +4,7 @@
             [me.raynes.fs :as fs]
             [slingshot.slingshot :refer [try+]]
             [clojure.string :as string]
+            [clj-time.core :as t]
             [puppetlabs.kitchensink.testutils :as testutils]
             [clojure.zip :as zip])
   (:import (java.util ArrayList)))
@@ -774,3 +775,20 @@
           b (deref-swap! a inc)]
       (is (= 11 @a))
       (is (= 10 b)))))
+
+(deftest parse-interval-test
+  (are [x y] (= x (parse-interval y))
+    (t/seconds 11) "11s"
+    (t/minutes 12) "12m"
+    (t/hours 13) "13h"
+    (t/days 14) "14d"
+    (t/years 15) "15y"
+    (t/seconds 0) "0"
+    (t/seconds 10) "10"
+    nil "15a"
+    nil "h"
+    nil "12hhh"
+    nil "12H"
+    nil "1,300y"
+    nil ""
+    nil nil))
