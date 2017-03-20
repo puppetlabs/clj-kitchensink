@@ -150,10 +150,9 @@ to be a zipper."
 (defn lines
   "Returns a sequence of lines from the given filename"
   [filename]
-  (-> filename
-    (fs/file)
-    (reader)
-    (line-seq)))
+  (with-open [file-reader (reader (fs/file filename))]
+    ;; line seq is lazy and file-reader gets closed
+    (doall (line-seq file-reader))))
 
 (defn mkdirs!
   "Given a path (may be a File or a string), creates a directory (including any
@@ -765,12 +764,13 @@ to be a zipper."
           (every? keyword? (keys %))
           (every? map? (vals %))]}
 
-  (reduce (fn [acc [name section]]
-            (assoc acc
-              (keywordize name)
-              (create-section-map section)))
-          {}
-          (parse-ini (reader filename))))
+  (with-open [ini (reader filename)]
+    (reduce (fn [acc [name section]]
+              (assoc acc
+                     (keywordize name)
+                     (create-section-map section)))
+            {}
+            (parse-ini ini))))
 
 (defn inis-to-map
   "Takes a path and converts the pointed-at .ini files into a nested
