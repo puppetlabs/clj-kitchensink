@@ -1,3 +1,11 @@
+## 2.3.0
+
+This is a minor feature release.
+
+Features:
+* add a parser for period strings (7d, 12h, etc) into Joda Periods
+* fix file connection leaks in the functions 'lines' and 'ini-to-map'
+
 ## 2.2.0
 
 This is a minor feature release.
