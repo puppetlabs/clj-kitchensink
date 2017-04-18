@@ -409,6 +409,11 @@ to be a zipper."
         (when-not (empty? res)
           res)))))
 
+(defn leaves
+  "Returns a sequence containing all leaf nodes of a map."
+  [m]
+  (flatten (map #(if (map? %) (leaves %) %) (vals m))))
+
 (defn walk-leaves
   "Walk a map applying a function to all leaf nodes"
   [m f]
