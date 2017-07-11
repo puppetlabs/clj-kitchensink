@@ -1067,11 +1067,25 @@ to be a zipper."
            ~@(interleave (repeat g) (map pstep forms))]
        ~g)))
 
+(defn- port-open?
+  [port]
+  (try
+    (with-open [_ (java.net.ServerSocket. port)]
+      port)
+    (catch java.net.BindException e
+      (when-not (re-find #"already in use" (.getMessage e))
+        (throw e)))))
+
 (defn open-port-num
-  "Returns a currently open port number"
+  "Returns a currently open port number in the traditional ephemeral port range
+  of 49152 through 65535."
   []
-  (with-open [s (java.net.ServerSocket. 0)]
-    (.getLocalPort s)))
+  (let [lo 49152
+        hi 65536] ; one higher because the upper limit is exclusive
+    (if-let [open-port (some port-open? (shuffle (range lo hi)))]
+      open-port
+      (throw (java.net.BindException.
+               "All ephemeral ports are already in use (Bind failed)")))))
 
 (defmacro assoc-if-new
   "Assocs the provided values with the corresponding keys if and only
