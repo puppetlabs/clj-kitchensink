@@ -18,6 +18,11 @@
       "github": "camlow325",
       "email": "jeremy.barlow@puppet.com",
       "name": "Jeremy Barlow"
+    },
+    {
+      "github": "aperiodic",
+      "email": "dlp@puppet.com",
+      "name": "Dan Lidral-Porter"
     }
   ]
 }
