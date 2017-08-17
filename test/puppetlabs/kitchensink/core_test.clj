@@ -430,6 +430,22 @@
       (is (= "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"
              (utf8-string->sha256 "foobar"))))))
 
+(deftest file-hashing
+  (testing "Computing a SHA-256 hash for a file"
+    (testing "should fail if not passed a file"
+      (is (thrown? AssertionError (file->sha256 "what"))))
+
+    (let [f (temp-file "sha256" ".txt")]
+      (spit f "foobar")
+
+      (testing "should produce a stable hash"
+        (is (= (file->sha256 f)
+               (file->sha256 f))))
+
+      (testing "should produce the correct hash"
+        (is (= "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"
+               (file->sha256 f)))))))
+
 (deftest temp-file-name-test
   (testing "The file should not exist."
     (is (not (fs/exists? (temp-file-name "foo")))))

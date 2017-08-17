@@ -974,6 +974,15 @@ to be a zipper."
   (let [bytes (.getBytes s "UTF-8")]
     (digest/sha-256 [bytes])))
 
+(defn file->sha256
+  "Compute a SHA-256 hash for the given java.io.File object.
+  Uses an InputStream to read the file, so it doesn't load all the contents into
+  memory at once."
+  [^java.io.File file]
+  {:pre  [(instance? java.io.File file)]
+   :post [(string? %)]}
+  (digest/sha-256 file))
+
 (defn bounded-memoize
   "Similar to memoize, but the cache will be reset if the number of entries
   exceeds the specified `bound`."
