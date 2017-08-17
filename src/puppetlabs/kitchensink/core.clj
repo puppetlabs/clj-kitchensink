@@ -965,6 +965,15 @@ to be a zipper."
   (let [bytes (.getBytes s "UTF-8")]
     (digest/sha-1 [bytes])))
 
+(defn utf8-string->sha256
+  "Compute a SHA-256 hash for the UTF-8 encoded version of the supplied
+  string"
+  [^String s]
+  {:pre  [(string? s)]
+   :post [(string? %)]}
+  (let [bytes (.getBytes s "UTF-8")]
+    (digest/sha-256 [bytes])))
+
 (defn bounded-memoize
   "Similar to memoize, but the cache will be reset if the number of entries
   exceeds the specified `bound`."

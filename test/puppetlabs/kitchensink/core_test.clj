@@ -416,7 +416,19 @@
 
     (testing "should produce the correct hash"
       (is (= "8843d7f92416211de9ebb963ff4ce28125932878"
-            (utf8-string->sha1 "foobar"))))))
+             (utf8-string->sha1 "foobar")))))
+
+  (testing "Computing a SHA-256 for a UTF-8 string"
+    (testing "should fail if not passed a string"
+      (is (thrown? AssertionError (utf8-string->sha256 1234))))
+
+    (testing "should produce a stable hash"
+      (is (= (utf8-string->sha256 "foobar")
+             (utf8-string->sha256 "foobar"))))
+
+    (testing "should produce the correct hash"
+      (is (= "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"
+             (utf8-string->sha256 "foobar"))))))
 
 (deftest temp-file-name-test
   (testing "The file should not exist."
