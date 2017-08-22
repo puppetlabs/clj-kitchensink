@@ -1,3 +1,17 @@
+## 2.4.0
+
+This is a minor feature and improvement release.
+
+Features:
+* add a `utf8-string->sha256` function, directly analogous to `utf8-string->sha1`
+* add a `file->sha256` function, equivalent to reading a file's contents as a
+  UTF-8 string and hashing the result. Uses an InputStream internally to avoid
+  reading the entire file into memory at once.
+
+Improvement:
+* the `open-port-num` function should now return a random port number from the
+  entire traditional ephemeral port range of 49152 through 65535.
+
 ## 2.3.0
 
 This is a minor feature release.
