@@ -35,7 +35,7 @@ Features:
 
 Maintenance:
 
-* Update to dynapath 0.2.5, to address some compatability issues with Java 9.
+* Update to dynapath 0.2.5, to address some compatibility issues with Java 9.
 
 ## 2.1.1
 
