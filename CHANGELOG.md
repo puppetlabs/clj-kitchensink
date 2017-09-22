@@ -1,3 +1,10 @@
+## 2.5.0
+
+This is a minor feature release.
+
+Features:
+* add a `stream->sha256` function for hashing the contents of an InputStream
+
 ## 2.4.0
 
 This is a minor feature and improvement release.
