@@ -5,6 +5,7 @@
 ;; altogether. But who has time for that?
 
 (ns puppetlabs.kitchensink.core
+  (:refer-clojure :exclude [boolean? uuid?])
   (:import [org.ini4j Ini Config BasicProfileSection]
            [javax.naming.ldap LdapName]
            [java.io StringWriter Reader File])

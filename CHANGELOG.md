@@ -1,3 +1,10 @@
+## 2.5.1
+
+This is a minor maintenance release.
+
+Maintenance:
+* Fix symbol redef warnings under Clojure 1.9
+
 ## 2.5.0
 
 This is a minor feature release.
