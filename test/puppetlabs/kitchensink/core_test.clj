@@ -7,7 +7,8 @@
             [clj-time.core :as t]
             [puppetlabs.kitchensink.testutils :as testutils]
             [clojure.zip :as zip])
-  (:import (java.util ArrayList)))
+  (:import (java.util ArrayList)
+           (java.io ByteArrayInputStream)))
 
 (deftest array?-test
   (testing "array?"
@@ -429,6 +430,20 @@
     (testing "should produce the correct hash"
       (is (= "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"
              (utf8-string->sha256 "foobar"))))))
+
+(deftest stream-hashing
+  (testing "Computing a SHA-256 hash for an input stream"
+    (testing "should fail if not passed an input stream"
+      (is (thrown? AssertionError (stream->sha256 "what"))))
+
+    (let [stream-fn #(ByteArrayInputStream. (.getBytes "foobar" "UTF-8"))]
+      (testing "should produce a stable hash"
+        (is (= (stream->sha256 (stream-fn))
+               (stream->sha256 (stream-fn)))))
+
+      (testing "should produce the correct hash"
+        (is (= "c3ab8ff13720e8ad9047dd39466b3c8974e592c2fa383d4a3960714caef0c4f2"
+               (stream->sha256 (stream-fn))))))))
 
 (deftest file-hashing
   (testing "Computing a SHA-256 hash for a file"

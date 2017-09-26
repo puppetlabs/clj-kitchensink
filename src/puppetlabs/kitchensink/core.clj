@@ -974,6 +974,13 @@ to be a zipper."
   (let [bytes (.getBytes s "UTF-8")]
     (digest/sha-256 [bytes])))
 
+(defn stream->sha256
+  "Compute a SHA-256 hash for the given java.io.InputStream object."
+  [^java.io.InputStream stream]
+  {:pre  [(instance? java.io.InputStream stream)]
+   :post [(string? %)]}
+  (digest/sha-256 stream))
+
 (defn file->sha256
   "Compute a SHA-256 hash for the given java.io.File object.
   Uses an InputStream to read the file, so it doesn't load all the contents into
