@@ -1,12 +1,19 @@
 (ns puppetlabs.kitchensink.classpath-test
   (:require [clojure.test :refer :all]
-            [puppetlabs.kitchensink.classpath :refer [with-additional-classpath-entries]])
-  (:import (java.net URL)))
+            [dynapath.dynamic-classpath :refer [classpath-urls]]
+            [puppetlabs.kitchensink.classpath :refer [add-classpath
+                                                      with-additional-classpath-entries]])
+  (:import (java.net URL))
+  (:refer-clojure :exclude (add-classpath)))
 
 (deftest with-additional-classpath-entries-test
   (let [paths ["/foo" "/bar"]
         get-urls #(into #{}
-                        (.getURLs (.getContextClassLoader (Thread/currentThread))))]
+                        (classpath-urls (.getContextClassLoader (Thread/currentThread))))]
+    ;; Called for side effect of ensuring there's a modifiable classloader
+    ;; without needing to make that function public
+    (add-classpath "file:/nil")
+
     (with-additional-classpath-entries
       paths
       (testing "classloader now includes the new paths"

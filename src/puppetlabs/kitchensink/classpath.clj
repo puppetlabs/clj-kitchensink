@@ -35,6 +35,15 @@
   [cl]
   (dp/addable-classpath? cl))
 
+(defn- ensure-modifiable-classloader
+  "Check if there is a modifiable classloader in the current hierarchy, and add
+  one if not."
+  []
+  (let [classloader (.. Thread currentThread getContextClassLoader)]
+    (when (not-any? modifiable-classloader? (classloader-hierarchy classloader))
+      (let [new-cl (clojure.lang.DynamicClassLoader. classloader)]
+        (.. Thread currentThread (setContextClassLoader new-cl))))))
+
 (defn add-classpath
   "A corollary to the (deprecated) `add-classpath` in clojure.core. This implementation
    requires a java.io.File or String path to a jar file or directory, and will attempt
@@ -57,6 +66,7 @@
    (if-not (dp/add-classpath-url classloader (.toURL (file jar-or-dir)))
      (throw (IllegalStateException. (str classloader " is not a modifiable classloader")))))
   ([jar-or-dir]
+   (ensure-modifiable-classloader)
    (let [classloaders (classloader-hierarchy)]
      (if-let [cl (last (filter modifiable-classloader? classloaders))]
        (add-classpath jar-or-dir cl)
