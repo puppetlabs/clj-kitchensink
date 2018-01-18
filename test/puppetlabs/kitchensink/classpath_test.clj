@@ -4,16 +4,14 @@
   (:import (java.net URL)))
 
 (deftest with-additional-classpath-entries-test
-  (let [paths ["/foo" "/bar"]
-        get-urls #(into #{}
-                        (.getURLs (.getContextClassLoader (Thread/currentThread))))]
+  (let [paths ["classpath-test"]
+        get-resource #(-> (Thread/currentThread)
+                          .getContextClassLoader
+                          (.getResource "does-not-exist-anywhere-else"))]
     (with-additional-classpath-entries
       paths
-      (testing "classloader now includes the new paths"
-        (let [urls (get-urls)]
-          (is (contains? urls (URL. "file:/foo")))
-          (is (contains? urls (URL. "file:/bar"))))))
-    (testing "classloader has been restored to its previous state"
-      (let [urls (get-urls)]
-        (is (not (contains? urls (URL. "file:/foo"))))
-        (is (not (contains? urls (URL. "file:/bar"))))))))
+      (testing "classloader now includes the new path"
+        (is (get-resource))))
+
+    (testing "classloader no longer includes the new path"
+      (is (not (get-resource))))))
