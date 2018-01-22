@@ -1,3 +1,10 @@
+## 2.5.2
+
+This is a minor maintenance release.
+
+Maintenance:
+* Fix adding URLs to classpath under Java 9.
+
 ## 2.5.1
 
 This is a minor maintenance release.
