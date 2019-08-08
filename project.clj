@@ -1,11 +1,11 @@
-(defproject puppetlabs/kitchensink "2.5.3-SNAPSHOT"
+(defproject puppetlabs/kitchensink "3.0.0-SNAPSHOT"
   :description "Clojure utility functions"
   :license {:name "Apache License, Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0.html"}
 
-  :min-lein-version "2.7.1"
+  :min-lein-version "2.9.1"
 
-  :parent-project {:coords [puppetlabs/clj-parent "1.4.2"]
+  :parent-project {:coords [puppetlabs/clj-parent "4.0.0"]
                    :inherit [:managed-dependencies]}
 
   ;; Abort when version ranges or version conflicts are detected in
@@ -18,14 +18,13 @@
                  [org.clojure/tools.cli]
 
                  [clj-time]
-                 [me.raynes/fs]
+                 [clj-commons/fs]
                  [slingshot]
                  [cheshire]
 
                  [org.ini4j/ini4j "0.5.2"]
-                 [org.tcrawley/dynapath "1.0.0"]
+                 [org.tcrawley/dynapath]
                  [digest "1.4.3"]
-
                  ]
 
   ;; By declaring a classifier here and a corresponding profile below we'll get an additional jar
@@ -38,7 +37,7 @@
 
   ;; this plugin is used by jenkins jobs to interrogate the project version
   :plugins [[lein-project-version "0.1.0"]
-            [lein-parent "0.3.1"]]
+            [lein-parent "0.3.7"]]
 
   :test-selectors {:default (complement :slow)
                    :slow :slow}
