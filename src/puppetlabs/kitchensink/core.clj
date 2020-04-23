@@ -6,25 +6,21 @@
 
 (ns puppetlabs.kitchensink.core
   (:refer-clojure :exclude [boolean? uuid?])
-  (:import [org.ini4j Ini Config BasicProfileSection]
-           [javax.naming.ldap LdapName]
-           [java.io StringWriter Reader File])
-  (:require [clojure.tools.logging :as log]
-            [clojure.string :as string]
+  (:require [clj-time.coerce :refer [ICoerce to-date-time]]
+            [clj-time.core :refer [days hours minutes now seconds years]]
+            [clj-time.format :refer [formatters unparse]]
+            [clojure.java.io :as io :refer [reader]]
+            [clojure.pprint :refer [pprint]]
+            [clojure.set :refer [difference union]]
+            [clojure.string :as string :refer [split]]
             [clojure.tools.cli :as cli]
-            [clojure.java.io :as io]
-            [digest]
-            [slingshot.slingshot :refer [throw+]]
-            [me.raynes.fs :as fs])
-  (:use [clojure.java.io :only (reader)]
-        [clojure.set :only (difference union)]
-        [clojure.string :only (split)]
-        [clojure.stacktrace :only (print-cause-trace)]
-        [clojure.pprint :only [pprint]]
-        [clj-time.core :only [now seconds minutes hours days years]]
-        [clj-time.coerce :only [ICoerce to-date-time]]
-        [clj-time.format :only [formatters unparse]]))
-
+            [clojure.tools.logging :as log]
+            digest
+            [me.raynes.fs :as fs]
+            [slingshot.slingshot :refer [throw+]])
+  (:import [java.io File Reader StringWriter]
+           javax.naming.ldap.LdapName
+           [org.ini4j BasicProfileSection Config Ini]))
 
 (defn error-map
   [kind message]
