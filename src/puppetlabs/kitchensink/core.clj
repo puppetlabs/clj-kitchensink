@@ -6,25 +6,21 @@
 
 (ns puppetlabs.kitchensink.core
   (:refer-clojure :exclude [boolean? uuid?])
-  (:import [org.ini4j Ini Config BasicProfileSection]
-           [javax.naming.ldap LdapName]
-           [java.io StringWriter Reader File])
-  (:require [clojure.tools.logging :as log]
+  (:require [clj-time.coerce :as time-coerce]
+            [clj-time.core :as time]
+            [clj-time.format :as time-format]
+            [clojure.java.io :as io]
+            [clojure.pprint :as pprint]
+            [clojure.set :as set]
             [clojure.string :as string]
             [clojure.tools.cli :as cli]
-            [clojure.java.io :as io]
-            [digest]
-            [slingshot.slingshot :refer [throw+]]
-            [me.raynes.fs :as fs])
-  (:use [clojure.java.io :only (reader)]
-        [clojure.set :only (difference union)]
-        [clojure.string :only (split)]
-        [clojure.stacktrace :only (print-cause-trace)]
-        [clojure.pprint :only [pprint]]
-        [clj-time.core :only [now seconds minutes hours days years]]
-        [clj-time.coerce :only [ICoerce to-date-time]]
-        [clj-time.format :only [formatters unparse]]))
-
+            [clojure.tools.logging :as log]
+            digest
+            [me.raynes.fs :as fs]
+            [slingshot.slingshot :refer [throw+]])
+  (:import [java.io File Reader StringWriter]
+           javax.naming.ldap.LdapName
+           [org.ini4j BasicProfileSection Config Ini]))
 
 (defn error-map
   [kind message]
@@ -45,8 +41,8 @@
   convertible to a Joda DateTime"
   [x]
   (and
-    (satisfies? ICoerce x)
-    (to-date-time x)))
+    (satisfies? time-coerce/ICoerce x)
+    (time-coerce/to-date-time x)))
 
 (defn boolean?
   "Returns true if the value is a boolean"
@@ -116,7 +112,7 @@ to be a zipper."
 
 (defn pprint-to-string [x]
   (let [w (StringWriter.)]
-    (pprint x w)
+    (pprint/pprint x w)
     (.toString w)))
 
 (defn to-sentence
@@ -151,7 +147,7 @@ to be a zipper."
 (defn lines
   "Returns a sequence of lines from the given filename"
   [filename]
-  (with-open [file-reader (reader (fs/file filename))]
+  (with-open [file-reader (io/reader (fs/file filename))]
     ;; line seq is lazy and file-reader gets closed
     (doall (line-seq file-reader))))
 
@@ -304,9 +300,9 @@ to be a zipper."
 ;; ## Collection operations
 
 (defn symmetric-difference
-  "Computes the symmetric difference between 2 sets"
+  "Computes the symmetric set/difference between 2 sets"
   [s1 s2]
-  (union (difference s1 s2) (difference s2 s1)))
+  (set/union (set/difference s1 s2) (set/difference s2 s1)))
 
 (defn as-collection
   "Returns the item wrapped in a collection, if it's not one
@@ -604,9 +600,9 @@ to be a zipper."
   "Returns a timestamp string for the given `time`, or the current time if none
   is provided. The format of the timestamp is eg. 2012-02-23T22:01:39.539Z."
   ([]
-    (timestamp (now)))
+    (timestamp (time/now)))
   ([time]
-    (unparse (formatters :date-time) time)))
+    (time-format/unparse (time-format/formatters :date-time) time)))
 
 ;; ## Exception handling
 
@@ -741,7 +737,7 @@ to be a zipper."
           {} section))
 
 (defn parse-ini
-  "Takes a reader that contains an ini file, and returns an Ini object
+  "Takes a io/reader that contains an ini file, and returns an Ini object
   containing the parsed results"
   [^Reader ini-reader]
   {:pre [(instance? Reader ini-reader)]
@@ -765,7 +761,7 @@ to be a zipper."
           (every? keyword? (keys %))
           (every? map? (vals %))]}
 
-  (with-open [ini (reader filename)]
+  (with-open [ini (io/reader filename)]
     (reduce (fn [acc [name section]]
               (assoc acc
                      (keywordize name)
@@ -1044,9 +1040,9 @@ to be a zipper."
           (string? b)]
    :post [(number? %)]}
   (let [parse #(mapv parse-int (-> %
-                                 (split #"-")
+                                 (string/split #"-")
                                  (first)
-                                 (split #"[\\._]")))]
+                                 (string/split #"[\\._]")))]
     (compare (parse a) (parse b))))
 
 (def java-version
@@ -1139,7 +1135,7 @@ to be a zipper."
 (defn parse-interval
   "Given a time string of the form \"<number>\", or \"<number><unit>\", this
   function parses this time amount and returns a joda time Period instance.
-  If the unit is left off, the units are assumed to be seconds
+  If the unit is left off, the units are assumed to be time/seconds
 
   Example: \"12h\" -> (clj-time.core/hours 12)
   Example: \"12\" -> (clj-time.core/seconds 12)
@@ -1152,10 +1148,10 @@ to be a zipper."
     (when-let [[_ num unit] (re-matches #"^(\d+)([smhdy]?)$" time-str)]
       (let [num (parse-int num)
             time-fn (case unit
-                      "s" seconds
-                      "m" minutes
-                      "h" hours
-                      "d" days
-                      "y" years
-                      "" seconds)]
+                      "s" time/seconds
+                      "m" time/minutes
+                      "h" time/hours
+                      "d" time/days
+                      "y" time/years
+                      "" time/seconds)]
         (time-fn num)))))
