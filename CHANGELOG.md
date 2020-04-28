@@ -1,3 +1,14 @@
+## 3.1.0
+
+This is a minor feature release.
+
+* Add a function for atomic file writes
+
+## 3.0.0
+
+Maintenance:
+* Update dependencies to take up clj-parent 4
+
 ## 2.5.2
 
 This is a minor maintenance release.
