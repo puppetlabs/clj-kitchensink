@@ -1,3 +1,10 @@
+## 2.6.0
+
+This is a minor feature release.
+
+Feature:
+* Add a function to atomically write files
+
 ## 2.5.2
 
 This is a minor maintenance release.
