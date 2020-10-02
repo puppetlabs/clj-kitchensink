@@ -1099,15 +1099,19 @@ to be a zipper."
         (throw e)))))
 
 (defn open-port-num
-  "Returns a currently open port number in the traditional ephemeral port range
-  of 49152 through 65535."
+  "Returns a currently open port number in the port range 16384
+  through 32767. Note that on Linux, anything above 32767 lies in
+  the ephemeral port range, which is the range that the system uses
+  to allocate ports upon user request. Thus, we choose from a
+  different range to prevent possible port conflicts caused by
+  various services (e.g. database connection pools)."
   []
-  (let [lo 49152
-        hi 65536] ; one higher because the upper limit is exclusive
+  (let [lo 16384
+        hi 32768] ; one higher because the upper limit is exclusive
     (if-let [open-port (some port-open? (shuffle (range lo hi)))]
       open-port
       (throw (java.net.BindException.
-               "All ephemeral ports are already in use (Bind failed)")))))
+               (format "All ports in the range %d through %d are already in use (Bind failed)" lo (dec hi)))))))
 
 (defmacro assoc-if-new
   "Assocs the provided values with the corresponding keys if and only
