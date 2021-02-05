@@ -1,3 +1,11 @@
+## 3.1.2
+
+* Update clj-parent to resolve some outdated dependencies with security issues.
+
+## 3.1.1
+
+* Don't select an open port from the ephemeral range in open-port-num.
+
 ## 3.1.0
 
 This is a minor feature release.
@@ -129,9 +137,9 @@ This is a maintenance / minor feature release.
 
 ## 1.2.0
 
-* Add `temp-file-name` function, which returns a unique name to a temporary file, 
+* Add `temp-file-name` function, which returns a unique name to a temporary file,
   but does not actually create the file.
-* Add `with-timeout` macro, which returns a default value if executing an 
+* Add `with-timeout` macro, which returns a default value if executing an
   arbitrary block of code takes longer than a specified timeout.
 
 ## 1.1.0
@@ -176,6 +184,6 @@ This is a maintenance / minor feature release.
 
 ## 0.5.2
  * Minor change to the cli! function so that, in addition to the data that it already returned, it now also returns a string representation of a banner/usage summary.  Callers can use this to display a help message if additional validation of the cli args fails.
- * Utility functions added to ssl namespace that allow creation of an SSLContext or a KeyStore/TrustStore directly from the pem files. 
+ * Utility functions added to ssl namespace that allow creation of an SSLContext or a KeyStore/TrustStore directly from the pem files.
  * Added some JSON utility functions
  * Added a deep-merge utility function
