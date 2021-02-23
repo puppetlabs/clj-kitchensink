@@ -1159,3 +1159,16 @@ to be a zipper."
                       "y" time/years
                       "" time/seconds)]
         (time-fn num)))))
+
+;; ## HTTP Headers
+
+(defn base-type
+  "Parse a base type out of a Content-Type, returns nil if there's no match.
+  Does not validate any parameters."
+  ;; Content-Type header grammar https://tools.ietf.org/html/rfc7231#section-3.1.1.1
+  ;; token definition https://tools.ietf.org/html/rfc7230#section-3.2.6
+  ;; white space definition https://tools.ietf.org/html/rfc7230#section-3.2.3
+  [content-type]
+  (let [token #"[a-zA-Z0-9!#$%&'*+.^_`|~-]+"
+        matcher (format "^(%s/%s)(?:[ \t;]|$)" token token)]
+    (second (re-find (re-pattern matcher) content-type))))

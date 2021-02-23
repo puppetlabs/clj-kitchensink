@@ -835,3 +835,13 @@
     nil "1,300y"
     nil ""
     nil nil))
+
+(deftest base-type-test
+  (is (= "application/json" (base-type "application/json")))
+  (is (= "application/json" (base-type "application/json;charset=UTF-8")))
+  (is (= "application/json" (base-type "application/json ; charset=UTF-8")))
+
+  (is (= "foo/bar" (base-type "foo/bar;someparam=baz")))
+
+  (is (nil? (base-type "application/json:charset=UTF-8")))
+  (is (nil? (base-type "appl=ication/json ; charset=UTF-8"))))
