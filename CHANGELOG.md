@@ -1,3 +1,7 @@
+## 3.1.3
+
+* Add base-type function that returns the base type from an HTTP Content-Type header.
+
 ## 3.1.2
 
 * Update clj-parent to resolve some outdated dependencies with security issues.
