@@ -845,3 +845,7 @@
 
   (is (nil? (base-type "application/json:charset=UTF-8")))
   (is (nil? (base-type "appl=ication/json ; charset=UTF-8"))))
+
+(deftest keyword->str-test
+  (is (= "/foo" (keyword->str (keyword "/foo"))))
+  (is (= ":::" (keyword->str (keyword ":::")))))

@@ -1172,3 +1172,11 @@ to be a zipper."
   (let [token #"[a-zA-Z0-9!#$%&'*+.^_`|~-]+"
         matcher (format "^(%s/%s)(?:[ \t;]|$)" token token)]
     (second (re-find (re-pattern matcher) content-type))))
+
+(defn keyword->str
+  "Alternate implementation for `name`, which has unintended effects when trying to discard namespace
+   For example the keyword :/foo will be resolved to :foo using `name` but this function will transform
+   the keyword :/foo to the string /foo"
+  [kw]
+  {:pre [(keyword? kw)]}
+  (subs (str kw) 1))
