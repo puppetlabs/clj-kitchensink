@@ -141,6 +141,14 @@ to be a zipper."
       (> num-strings 3)
       (str (first strings) ", " (to-sentence (rest strings))))))
 
+(defn key->str
+  "Convert a keyword to a string, stripping the leading : character. This is
+  distinct from the `name` function as it will preserve the 'namespace' portion
+  before a slash. If the key is already a string, it is returned unmodified."
+  [kw]
+  (if (keyword? kw)
+    (subs (str kw) 1)
+    kw))
 
 ;; ## I/O
 
