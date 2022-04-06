@@ -1,3 +1,9 @@
+## 3.2.0
+
+This is a minor feature release.
+
+* Add key->str function to convert keywords to strings
+
 ## 3.1.3
 
 * Add base-type function that returns the base type from an HTTP Content-Type header.
