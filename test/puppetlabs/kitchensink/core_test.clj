@@ -108,6 +108,17 @@
        ["foo" "bar" "baz"] "foo, bar, and baz"
        ["foo" "bar" "baz" "qux"] "foo, bar, baz, and qux"))
 
+(deftest key->str-test
+  (testing "returns strings unmodified"
+    (is (= "foo" (key->str "foo")))
+    (is (= ":foo" (key->str ":foo")))
+    (is (= "foo/bar" (key->str "foo/bar"))))
+
+  (testing "returns the entire stringified keyword"
+    (is (= "foo" (key->str :foo)))
+    (is (= ":foo" (key->str (keyword ":foo"))))
+    (is (= "foo/bar" (key->str :foo/bar)))))
+
 (deftest mkdirs-test
   (testing "creates all specified directories that don't exist for File arg"
     (let [tmpdir (temp-dir)]
