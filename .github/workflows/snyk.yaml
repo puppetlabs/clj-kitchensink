@@ -23,7 +23,7 @@ jobs:
       id: scan
       uses: puppetlabs/security-snyk-clojure-action@v2
       with:
-        snykToken: ${{ secrets.SNYK_PE_KEY }}
+        snykToken: ${{ secrets.SNYK_PE_TOKEN }}
         snykOrg: 'puppet-enterprise'
         snykPolicy: '.snyk'
     - name: Check output
