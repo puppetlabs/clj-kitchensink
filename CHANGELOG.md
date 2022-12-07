@@ -1,3 +1,8 @@
+## 3.2.1
+
+* Update ini4j to 0.5.4 to address a Denial of Service
+  vulnerability (CVE-2022-41404).
+
 ## 3.2.0
 
 This is a minor feature release.
