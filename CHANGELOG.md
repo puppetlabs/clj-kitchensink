@@ -1,4 +1,7 @@
 ## unreleased
+
+## 3.2.2
+
 * add conversion functions from string -> ZonedDateTime -> string to facilitate the removal of clj-time
 * update clj-parent to 5.3.7
 
