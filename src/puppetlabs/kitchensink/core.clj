@@ -15,12 +15,14 @@
             [clojure.string :as string]
             [clojure.tools.cli :as cli]
             [clojure.tools.logging :as log]
-            digest
+            [digest]
             [me.raynes.fs :as fs]
             [slingshot.slingshot :refer [throw+]])
-  (:import [java.io File Reader StringWriter]
+  (:import (java.io File Reader StringWriter)
+           (java.time ZoneId ZoneOffset ZonedDateTime)
+           (java.time.format DateTimeFormatter)
            javax.naming.ldap.LdapName
-           [org.ini4j BasicProfileSection Config Ini]))
+           (org.ini4j BasicProfileSection Config Ini)))
 
 (defn error-map
   [kind message]
@@ -1180,3 +1182,23 @@ to be a zipper."
   (let [token #"[a-zA-Z0-9!#$%&'*+.^_`|~-]+"
         matcher (format "^(%s/%s)(?:[ \t;]|$)" token token)]
     (second (re-find (re-pattern matcher) content-type))))
+
+(defn ^String ZonedDateTime->timestamp-string
+  [^ZonedDateTime zdt]
+  (.format DateTimeFormatter/ISO_OFFSET_DATE_TIME zdt))
+
+(defn ^String now->timestamp-string
+  "Using the java native libraries, using the system clock, create a UTC based iso8601 timestamp"
+  []
+  (ZonedDateTime->timestamp-string (ZonedDateTime/now ZoneOffset/UTC)))
+
+(defn ^ZonedDateTime timestamp-string->ZonedDateTime
+  "Given an iso8601 timestamp with offset, convert it into a java.time.ZonedDateTime.
+  Throws DateTimeParseException if string can't be parsed"
+  [^String timestamp]
+  (ZonedDateTime/from (.parse DateTimeFormatter/ISO_OFFSET_DATE_TIME timestamp)))
+
+(defn ^ZonedDateTime ZonedDateTime->utc-ZonedDateTime
+  "given a zoned date time, convert it to the utc timezone"
+  [^ZonedDateTime zdt]
+  (.withZoneSameInstant zdt (ZoneId/of "UTC")))

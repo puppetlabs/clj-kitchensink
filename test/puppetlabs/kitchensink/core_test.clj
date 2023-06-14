@@ -1,14 +1,16 @@
 (ns puppetlabs.kitchensink.core-test
-  (:require [clojure.test :refer :all]
-            [puppetlabs.kitchensink.core :refer :all]
-            [me.raynes.fs :as fs]
-            [slingshot.slingshot :refer [try+]]
+  (:require [clj-time.core :as t]
             [clojure.string :as string]
-            [clj-time.core :as t]
+            [clojure.test :refer :all]
+            [clojure.zip :as zip]
+            [me.raynes.fs :as fs]
+            [puppetlabs.kitchensink.core :refer :all]
             [puppetlabs.kitchensink.testutils :as testutils]
-            [clojure.zip :as zip])
-  (:import (java.util ArrayList)
-           (java.io ByteArrayInputStream)))
+            [slingshot.slingshot :refer [try+]])
+  (:import (java.io ByteArrayInputStream)
+           (java.time Month ZonedDateTime)
+           (java.time.format DateTimeParseException)
+           (java.util ArrayList)))
 
 (deftest array?-test
   (testing "array?"
@@ -856,3 +858,55 @@
 
   (is (nil? (base-type "application/json:charset=UTF-8")))
   (is (nil? (base-type "appl=ication/json ; charset=UTF-8"))))
+
+(deftest now->timestamp-string-test
+  (let [result (now->timestamp-string)]
+    (is (re-matcher #"202\d-\d\d-\d\dT\d\d:\d\d:\d\d\.\d" result))))
+
+(deftest timestamp-string->ZonedDateTime-test
+  (testing "throws exceptions for invalid timestamps"
+    (is (thrown? DateTimeParseException (timestamp-string->ZonedDateTime "not a timestamp"))))
+  (testing "correctly converts timestamps to local date times"
+    (let [result (timestamp-string->ZonedDateTime "2023-06-14T17:27:51.732102Z")]
+      (is (instance? ZonedDateTime result))
+      (is (= 2023 (.getYear result)))
+      (is (= Month/JUNE (.getMonth result)))
+      (is (= 14 (.getDayOfMonth result)))
+      (is (= 17 (.getHour result)))
+      (is (= 27 (.getMinute result)))
+      (is (= 51 (.getSecond result)))
+      (is (= "Z" (.toString (.getZone result))))))
+  (testing "respects time zone"
+    (let [result (timestamp-string->ZonedDateTime "2023-06-14T17:27:51.732102+01:00")]
+      (is (instance? ZonedDateTime result))
+      (is (= 2023 (.getYear result)))
+      (is (= Month/JUNE (.getMonth result)))
+      (is (= 14 (.getDayOfMonth result)))
+      (is (= 17 (.getHour result)))
+      (is (= 27 (.getMinute result)))
+      (is (= 51 (.getSecond result)))
+      (is (= "+01:00" (.toString (.getZone result)))))))
+
+
+(deftest ZonedDateTime->utc-ZonedDateTime-test
+  (testing "does not impact timezone in utc"
+    (let [result (ZonedDateTime->utc-ZonedDateTime (timestamp-string->ZonedDateTime "2023-06-14T17:27:51.732102Z"))]
+      (is (instance? ZonedDateTime result))
+      (is (= 2023 (.getYear result)))
+      (is (= Month/JUNE (.getMonth result)))
+      (is (= 14 (.getDayOfMonth result)))
+      (is (= 17 (.getHour result)))
+      (is (= 27 (.getMinute result)))
+      (is (= 51 (.getSecond result)))
+      (is (= "UTC" (.toString (.getZone result))))))
+  (testing "converts non UTC to UtC"
+    (let [result (ZonedDateTime->utc-ZonedDateTime (timestamp-string->ZonedDateTime "2023-06-14T17:27:51.732102+01:00"))]
+      (is (instance? ZonedDateTime result))
+      (is (= 2023 (.getYear result)))
+      (is (= Month/JUNE (.getMonth result)))
+      (is (= 14 (.getDayOfMonth result)))
+      (is (= 16 (.getHour result)))
+      (is (= 27 (.getMinute result)))
+      (is (= 51 (.getSecond result)))
+      (is (= "UTC" (.toString (.getZone result)))))))
+

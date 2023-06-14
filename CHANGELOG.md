@@ -1,3 +1,7 @@
+## unreleased
+* add conversion functions from string -> ZonedDateTime -> string to facilitate the removal of clj-time
+* update clj-parent to 5.3.7
+
 ## 3.2.1
 
 * Update ini4j to 0.5.4 to address a Denial of Service
