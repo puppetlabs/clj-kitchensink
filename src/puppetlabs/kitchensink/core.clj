@@ -22,6 +22,7 @@
            (java.time ZoneId ZoneOffset ZonedDateTime)
            (java.time.format DateTimeFormatter)
            javax.naming.ldap.LdapName
+           (javax.naming.ldap Rdn)
            (org.ini4j BasicProfileSection Config Ini)))
 
 (defn error-map
@@ -923,7 +924,7 @@ to be a zipper."
   (some->> dn
     (LdapName.)
     (.getRdns)
-    (filter #(= "CN" (.getType %)))
+    (filter #(= "CN" (.getType ^Rdn %)))
     (first)
     (.getValue)
     (str)))
@@ -1259,9 +1260,9 @@ to be a zipper."
             (and (is-only-number? current-a) (is-only-number? current-b))
             (if (or (starts-with-zero? current-a)
                     (starts-with-zero? current-b))
-              (compare (.toUpperCase current-a) (.toUpperCase current-b))
+              (compare (.toUpperCase ^String current-a) (.toUpperCase ^String current-b))
               (compare (parse-int current-a) (parse-int current-b)))
 
             :else
-            (compare (.toUpperCase current-a) (.toUpperCase current-b)))))
+            (compare (.toUpperCase ^String current-a) (.toUpperCase ^String current-b)))))
       (compare a b))))

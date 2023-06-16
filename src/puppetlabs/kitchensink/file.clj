@@ -1,10 +1,10 @@
 (ns puppetlabs.kitchensink.file
-  (:import [java.io BufferedWriter FileOutputStream OutputStreamWriter]
-           [java.nio.file CopyOption Files LinkOption Paths StandardCopyOption]
-           [java.nio.file.attribute FileAttribute PosixFilePermissions]))
+  (:import (java.io BufferedWriter FileOutputStream OutputStreamWriter)
+           (java.nio.file CopyOption Files LinkOption Path Paths StandardCopyOption)
+           (java.nio.file.attribute FileAttribute PosixFilePermissions)))
 
 (defn str->path
-  [path]
+  ^Path [path]
   (Paths/get path (into-array String [])))
 
 (defn get-perms
@@ -58,7 +58,7 @@
          temp-file (Files/createTempFile dir (.toString (.getFileName target)) "tmp" temp-attributes)
          stream (proxy [FileOutputStream] [(.toString temp-file)]
                   (close []
-                    (.sync (.getFD this))
+                    (.sync (.getFD ^FileOutputStream this))
                     (proxy-super close)))
          writer (BufferedWriter. (OutputStreamWriter. stream))]
 
@@ -81,4 +81,4 @@
   ([path string]
    (atomic-write-string path string nil))
   ([path string permissions]
-   (atomic-write path #(.write % string) permissions)))
+   (atomic-write path #(.write ^BufferedWriter % ^String string) permissions)))

@@ -39,6 +39,16 @@
             [jonase/eastwood "1.2.2" :exclusions [org.clojure/clojure]]
             [lein-parent "0.3.7"]]
 
+  :eastwood {:ignored-faults {:unused-ret-vals {puppetlabs.kitchensink.classpath [{:line 93}]}
+                              :deprecations {puppetlabs.kitchensink.classpath [{:line 66}
+                                                                               {:line 91}]
+                                             puppetlabs.kitchensink.core [{:line 941}]}
+                              :reflection {puppetlabs.kitchensink.file [{:line 62}]
+                                           puppetlabs.kitchensink.core [{:line 929}]}
+                              :constant-test {puppetlabs.kitchensink.core-test [{:line 726}
+                                                                                {:line 733}]}}
+             :continue-on-exception true}
+
   :test-selectors {:default (complement :slow)
                    :slow :slow}
 

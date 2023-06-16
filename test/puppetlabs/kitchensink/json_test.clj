@@ -6,7 +6,8 @@
                                                  generate-string parse-stream parse-string spit-json
                                                  with-datetime-encoder]])
   (:use [clojure.test])
-  (:import (java.io StringReader StringWriter)))
+  (:import (com.fasterxml.jackson.core JsonGenerator)
+           (java.io StringReader StringWriter)))
 
 (defn add-common-encoders-fixture
   [f]
@@ -17,7 +18,7 @@
 
 (deftest test-with-custom-datetime-encoder
   (testing "should allow use of custom encoder"
-    (is (= (with-datetime-encoder (fn [_dt gn8r] (.writeString gn8r "Beer-o-clock"))
+    (is (= (with-datetime-encoder (fn [_dt gn8r] (.writeString ^JsonGenerator gn8r "Beer-o-clock"))
              (generate-string (clj-time/date-time 1989 11 17 5 6 24 654)))
            "\"Beer-o-clock\""))))
 

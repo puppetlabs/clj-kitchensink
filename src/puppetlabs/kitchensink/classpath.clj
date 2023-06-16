@@ -22,10 +22,10 @@
   "Returns a seq of classloaders, with the tip of the hierarchy first.
    Uses the current thread context ClassLoader as the tip ClassLoader
    if one is not provided."
-  ([] (classloader-hierarchy (.. Thread currentThread getContextClassLoader)))
+  ([] (classloader-hierarchy (. (Thread/currentThread) getContextClassLoader)))
   ([tip]
    (->> tip
-        (iterate #(.getParent %))
+        (iterate #(.getParent ^ClassLoader %))
         (take-while boolean))))
 
 (defn- modifiable-classloader?
@@ -96,7 +96,7 @@
   classpath is restored prior to returning."
   [jars-and-dirs & body]
   `{:pre [(coll? ~jars-and-dirs)
-         (every? (partial satisfies? Coercions) ~jars-and-dirs)]}
+          (every? (partial satisfies? Coercions) ~jars-and-dirs)]}
   `(let [orig-loader# (.. Thread currentThread getContextClassLoader)
          temp-loader# (URLClassLoader.
                         (into-array
