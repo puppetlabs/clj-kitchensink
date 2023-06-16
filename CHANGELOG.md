@@ -1,5 +1,6 @@
 ## unreleased
 
+# 3.2.3
 * add clj-kondo linting, eastwood linting, and PR testing
 * address issues identified by clj-kondo, and eastwood
 * add function equivalent of puppet's versioncmp function, and helper functions for to determine if strings have all numeric characters and if strings start with a leading zero.
