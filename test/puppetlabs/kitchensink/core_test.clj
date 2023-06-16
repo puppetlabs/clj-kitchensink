@@ -4,7 +4,18 @@
             [clojure.test :refer :all]
             [clojure.zip :as zip]
             [me.raynes.fs :as fs]
-            [puppetlabs.kitchensink.core :refer :all]
+            [puppetlabs.kitchensink.core :refer [ZonedDateTime->utc-ZonedDateTime absolute-path array?
+                                                 ascii-character-sets assoc-if-new base-type bounded-memoize cli!
+                                                 cn-for-dn cn-whitelist->authorizer compare-jvm-versions compare-versions contains-some
+                                                 datetime? deep-merge deep-merge-with deep-merge-with-keys deref-swap!
+                                                 dissoc-if-nil dissoc-in excludes-some excludes? file->sha256 filter-map
+                                                 ini-to-map inis-to-map is-only-number? key->str maptrans mapvals merge-with-key missing?
+                                                 mkdirs! now->timestamp-string open-port-num order-by parse-interval
+                                                 quotient rand-str rand-weighted-selection regexp? some-pred->>
+                                                 sort-nested-maps spit-ini starts-with-zero? stream->sha256 temp-dir temp-file
+                                                 temp-file-name timestamp-string->ZonedDateTime to-bool to-sentence
+                                                 true-str? utf8-string->sha1 utf8-string->sha256 uuid walk-leaves
+                                                 while-let with-timeout without-ns zipper?]]
             [puppetlabs.kitchensink.testutils :as testutils]
             [slingshot.slingshot :refer [try+]])
   (:import (java.io ByteArrayInputStream)
@@ -84,6 +95,7 @@
     (try+
       (to-bool "hi")
       (is (not true) "Expected exception to be thrown by to-bool when an invalid string is passed")
+      #_{:clj-kondo/ignore [:unresolved-symbol]}
       (catch map? m
         (is (contains? m :kind))
         (is (= :puppetlabs.kitchensink.core/parse-error (:kind m)))
@@ -323,15 +335,15 @@
 (deftest filter-map-test
   (testing "should filter based on a given predicate"
     (let [test-map {:dog 5 :cat 4 :mouse 7 :cow 6}]
-      (is (= (filter-map (fn [k v] (even? v)) test-map)
+      (is (= (filter-map (fn [_k v] (even? v)) test-map)
              {:cat 4, :cow 6}))
-      (is (= (filter-map (fn [k v] (= 3 (count (name k)))) test-map)
+      (is (= (filter-map (fn [k _v] (= 3 (count (name k)))) test-map)
              {:dog 5, :cat 4, :cow 6}))
       (is (= (filter-map (fn [k v] (and (= 3 (count (name k))) (> v 5))) test-map)
              {:cow 6}))
-      (is (= (filter-map (fn [k v] true) test-map)
+      (is (= (filter-map (fn [_k _v] true) test-map)
              test-map))
-      (is (= (filter-map (fn [k v] false) test-map)
+      (is (= (filter-map (fn [_k _v] false) test-map)
              {}))))
   (testing "should return empty map if given nil"
     (is (= {} (filter-map nil nil)))))
@@ -422,6 +434,7 @@
 (deftest string-hashing
   (testing "Computing a SHA-1 for a UTF-8 string"
     (testing "should fail if not passed a string"
+      #_{:clj-kondo/ignore [:type-mismatch]}
       (is (thrown? AssertionError (utf8-string->sha1 1234))))
 
     (testing "should produce a stable hash"
@@ -434,6 +447,7 @@
 
   (testing "Computing a SHA-256 for a UTF-8 string"
     (testing "should fail if not passed a string"
+      #_{:clj-kondo/ignore [:type-mismatch]}
       (is (thrown? AssertionError (utf8-string->sha256 1234))))
 
     (testing "should produce a stable hash"
@@ -447,6 +461,7 @@
 (deftest stream-hashing
   (testing "Computing a SHA-256 hash for an input stream"
     (testing "should fail if not passed an input stream"
+      #_ {:clj-kondo/ignore [:type-mismatch]}
       (is (thrown? AssertionError (stream->sha256 "what"))))
 
     (let [stream-fn #(ByteArrayInputStream. (.getBytes "foobar" "UTF-8"))]
@@ -593,6 +608,7 @@
 
 (deftest cert-utils
   (testing "extracting cn from a dn"
+    #_{:clj-kondo/ignore [:type-mismatch]}
     (is (thrown? AssertionError (cn-for-dn 123))
       "should throw error when arg is a number")
     (is (thrown? AssertionError (cn-for-dn nil))
@@ -721,12 +737,15 @@
           (some-pred->> nil? 1
             (* 2)
             (+ 9)
+            #_ {:clj-kondo/ignore [:invalid-arity]}
             (dec)))))
   (testing "should break and return the value if the pred matches"
     (is (= {:a 1}
           (some-pred->> map? 5
             (/ 5)
+            #_ {:clj-kondo/ignore [:invalid-arity]}
             (assoc {} :a)
+            #_ {:clj-kondo/ignore [:invalid-arity]}
             (keys))))))
 
 (deftest while-let-macro
@@ -734,6 +753,7 @@
         list (ArrayList.)]
     (dotimes [_ 5] (.add list "foo"))
     (let [iter (.iterator list)]
+      #_ {:clj-kondo/ignore [:unresolved-symbol]}
       (while-let [item (and (.hasNext iter)
                             (.next iter))]
         (swap! counter inc)))
@@ -807,7 +827,7 @@
 
 (deftest ^:slow open-port-num-test
   (let [port-in-use (open-port-num)]
-    (with-open [s (java.net.ServerSocket. port-in-use)]
+    (with-open [_s (java.net.ServerSocket. port-in-use)]
       (let [open-ports (set (take 60000 (repeatedly open-port-num)))]
         (is (every? pos? open-ports))
         (is (not (contains? open-ports port-in-use)))))))

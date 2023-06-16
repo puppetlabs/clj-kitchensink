@@ -45,9 +45,9 @@
    (let [target (str->path path)
          dir (.getParent target)
          file-exists? (Files/exists target nofollow-links)
-         owner (if file-exists?
+         owner (when file-exists?
                  (Files/getOwner target nofollow-links))
-         group (if file-exists?
+         group (when file-exists?
                  (Files/getAttribute target "posix:group" nofollow-links))
          permissions (if permissions
                        (PosixFilePermissions/fromString permissions)

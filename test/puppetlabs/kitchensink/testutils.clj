@@ -1,6 +1,5 @@
 (ns puppetlabs.kitchensink.testutils
-  (:require [me.raynes.fs :as fs]
-            [puppetlabs.kitchensink.core :as ks]))
+  (:require [puppetlabs.kitchensink.core :as ks]))
 
 (defn call-counter
   "Returns a method that just tracks how many times it's called, and

@@ -1,7 +1,7 @@
 (ns puppetlabs.kitchensink.file-test
   (:require [clojure.test :refer :all]
             [me.raynes.fs :as fs]
-            [puppetlabs.kitchensink.file :refer :all]))
+            [puppetlabs.kitchensink.file :refer [atomic-write get-perms set-perms] ]))
 
 (deftest atomic-write-test
   (testing "when the file doesn't exist"

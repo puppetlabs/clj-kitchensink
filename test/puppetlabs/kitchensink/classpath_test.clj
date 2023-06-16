@@ -1,7 +1,6 @@
 (ns puppetlabs.kitchensink.classpath-test
   (:require [clojure.test :refer :all]
-            [puppetlabs.kitchensink.classpath :refer [with-additional-classpath-entries]])
-  (:import (java.net URL)))
+            [puppetlabs.kitchensink.classpath :refer [with-additional-classpath-entries]]))
 
 (deftest with-additional-classpath-entries-test
   (let [paths ["classpath-test"]

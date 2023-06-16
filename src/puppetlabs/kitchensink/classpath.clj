@@ -63,7 +63,7 @@
    This function is copied out of the 'pomegranate' library
    (https://github.com/cemerick/pomegranate)."
   ([jar-or-dir classloader]
-   (if-not (dp/add-classpath-url classloader (.toURL (file jar-or-dir)))
+   (when-not (dp/add-classpath-url classloader (.toURL (file jar-or-dir)))
      (throw (IllegalStateException. (str classloader " is not a modifiable classloader")))))
   ([jar-or-dir]
    (ensure-modifiable-classloader)
