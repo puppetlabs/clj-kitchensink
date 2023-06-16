@@ -1,5 +1,7 @@
 ## unreleased
 
+* add function equivalent of puppet's versioncmp function, and helper functions for to determine if strings have all numeric characters and if strings start with a leading zero.
+
 ## 3.2.2
 
 * add conversion functions from string -> ZonedDateTime -> string to facilitate the removal of clj-time
