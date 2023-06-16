@@ -12,7 +12,6 @@
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]
             [clojure.set :as set]
-            [clojure.spec.alpha :as s]
             [clojure.string :as string]
             [clojure.tools.cli :as cli]
             [clojure.tools.logging :as log]
@@ -23,6 +22,7 @@
            (java.time ZoneId ZoneOffset ZonedDateTime)
            (java.time.format DateTimeFormatter)
            javax.naming.ldap.LdapName
+           (javax.naming.ldap Rdn)
            (org.ini4j BasicProfileSection Config Ini)))
 
 (defn error-map
@@ -208,11 +208,11 @@ to be a zipper."
   "Performs division on the supplied arguments, substituting `default`
   when the divisor is 0"
   ([dividend divisor]
-    (quotient dividend divisor 0))
+   (quotient dividend divisor 0))
   ([dividend divisor default]
-    (if (zero? divisor)
-      default
-      (/ dividend divisor))))
+   (if (zero? divisor)
+     default
+     (/ dividend divisor))))
 
 ;; ## Numerics
 
@@ -223,7 +223,7 @@ to be a zipper."
   {:pre  [(string? s)]
    :post [(or (integer? %) (nil? %))]}
   (try (Integer/parseInt s)
-    (catch java.lang.NumberFormatException e
+    (catch NumberFormatException _e
       nil)))
 
 (defn parse-float
@@ -233,7 +233,7 @@ to be a zipper."
   {:pre  [(string? s)]
    :post [(or (float? %) (nil? %))]}
   (try (Float/parseFloat s)
-    (catch java.lang.NumberFormatException e
+    (catch NumberFormatException _e
       nil)))
 
 (defn parse-number
@@ -320,12 +320,12 @@ to be a zipper."
   already. Returns a list by default, or you can use a constructor func
   as the second arg."
   ([item]
-    (as-collection item list))
+   (as-collection item list))
   ([item constructor]
-    {:post [(coll? %)]}
-    (if (coll? item)
-      item
-      (constructor item))))
+   {:post [(coll? %)]}
+   (if (coll? item)
+     item
+     (constructor item))))
 
 (defn seq-contains?
   "True if seq contains elm"
@@ -348,13 +348,13 @@ to be a zipper."
   "If coll `contains?` any of the keys in ks, returns the first such
   key.  Otherwise returns nil."
   [coll ks]
-  (some #(if (contains? coll %) %) ks))
+  (some #(when (contains? coll %) %) ks))
 
 (defn excludes-some
   "If coll `excludes?` any of the keys in ks, returns the first such
   key.  Otherwise returns nil."
   [coll ks]
-  (some #(if (excludes? coll %) %) ks))
+  (some #(when (excludes? coll %) %) ks))
 
 (defn mapvals
   "Return map `m`, with each value transformed by function `f`.
@@ -362,13 +362,13 @@ to be a zipper."
   You may also provide an optional list of keys `ks`; if provided, only the
   specified keys will be modified."
   ([f m]
-    (into {} (for [[k v] m] [k (f v)])))
+   (into {} (for [[k v] m] [k (f v)])))
   ([f ks m]
     ;; would prefer to share code between the two implementations here, but
     ;; the `into` is much faster for the base case and the reduce is much
     ;; faster for any case where we're operating on a subset of the keys.
     ;; It seems like `select-keys` is fairly expensive.
-    (reduce (fn [m k] (update-in m [k] f)) m ks)))
+   (reduce (fn [m k] (update-in m [k] f)) m ks)))
 
 (defn mapkeys
   "Return map `m`, with each key transformed by function `f`"
@@ -395,13 +395,13 @@ to be a zipper."
   returns a modified map with the specified key removed.  If the value is not `nil`,
   simply returns the original map."
   ([m k]
-    {:pre  [(map? m)]
-     :post [(map? %)]}
-    (if (nil? (m k))
+   {:pre  [(map? m)]
+    :post [(map? %)]}
+   (if (nil? (m k))
       (dissoc m k)
       m))
   ([m k & ks]
-    (let [ret (dissoc-if-nil m k)]
+   (let [ret (dissoc-if-nil m k)]
       (if ks
         (recur ret (first ks) (next ks))
         ret))))
@@ -611,9 +611,9 @@ to be a zipper."
   "Returns a timestamp string for the given `time`, or the current time if none
   is provided. The format of the timestamp is eg. 2012-02-23T22:01:39.539Z."
   ([]
-    (timestamp (time/now)))
+   (timestamp (time/now)))
   ([time]
-    (time-format/unparse (time-format/formatters :date-time) time)))
+   (time-format/unparse (time-format/formatters :date-time) time)))
 
 ;; ## Exception handling
 
@@ -630,10 +630,11 @@ to be a zipper."
   "Executes the supplied fn repeatedly. Execution may be stopped with an
   InterruptedException."
   [f on-error]
-  (if (try
+  (when
+    (try
         (f)
         true
-        (catch InterruptedException e
+        (catch InterruptedException _e
           false)
         (catch Throwable e
           (on-error e)
@@ -715,7 +716,6 @@ to be a zipper."
   You may also call with no arguments, in which case the prefix string will be
   empty."
   [& args]
-  temp-dir
   (if (empty? args)
     (delete-on-exit (fs/temp-dir nil))
     (delete-on-exit (apply fs/temp-dir args))))
@@ -787,12 +787,12 @@ to be a zipper."
   directory, we return a merged version of parsing all the .ini files
   in the directory (we do not do a recursive find of .ini files)."
   ([path]
-    (inis-to-map path "*.ini"))
+   (inis-to-map path "*.ini"))
   ([path glob-pattern]
-    {:pre  [(or (string? path)
+   {:pre  [(or (string? path)
               (instance? java.io.File path))]
-     :post [(map? %)]}
-    (let [files (if-not (fs/directory? path)
+    :post [(map? %)]}
+   (let [files (if-not (fs/directory? path)
                   [path]
                   (fs/glob (fs/file path glob-pattern)))]
       (->> files
@@ -871,8 +871,8 @@ to be a zipper."
     still invalid in some way."
   ([args specs] (cli! args specs nil))
   ([args specs required-args]
-  (let [specs (conj specs ["-h" "--help" "Show help" :default false])
-        {:keys [options arguments summary errors]} (cli/parse-opts args specs)]
+   (let [specs (conj specs ["-h" "--help" "Show help" :default false])
+         {:keys [options arguments summary errors]} (cli/parse-opts args specs)]
     (when errors
       (let [msg (str
                   "\n\n"
@@ -883,7 +883,7 @@ to be a zipper."
         (throw+ (error-map ::cli-error msg))))
     (when (:help options)
       (throw+ (error-map ::cli-help summary)))
-    (when-let [missing-field (some #(if (not (contains? options %)) %) required-args)]
+    (when-let [missing-field (some #(when-not (contains? options %) %) required-args)]
       (let [msg (str
                   "\n\n"
                   (format "Missing required argument '--%s'!" (name missing-field))
@@ -924,7 +924,7 @@ to be a zipper."
   (some->> dn
     (LdapName.)
     (.getRdns)
-    (filter #(= "CN" (.getType %)))
+    (filter #(= "CN" (.getType ^Rdn %)))
     (first)
     (.getValue)
     (str)))
@@ -958,7 +958,7 @@ to be a zipper."
             (instance? java.io.File whitelist))]
    :post [(fn? %)]}
   (let [allowed? (set (lines whitelist))]
-    (fn [{:keys [ssl-client-cn scheme] :as req}]
+    (fn [{:keys [ssl-client-cn scheme]}]
       (or (= scheme :http)
         (allowed? ssl-client-cn)))))
 
@@ -1027,7 +1027,7 @@ to be a zipper."
   (try
     (java.util.UUID/fromString uuid)
     true
-    (catch IllegalArgumentException e
+    (catch IllegalArgumentException _e
       false)))
 
 ;; ## System interface
@@ -1184,26 +1184,25 @@ to be a zipper."
         matcher (format "^(%s/%s)(?:[ \t;]|$)" token token)]
     (second (re-find (re-pattern matcher) content-type))))
 
-(defn ^String ZonedDateTime->timestamp-string
-  [^ZonedDateTime zdt]
+(defn ZonedDateTime->timestamp-string
+  ^String [^ZonedDateTime zdt]
   (.format DateTimeFormatter/ISO_OFFSET_DATE_TIME zdt))
 
-(defn ^String now->timestamp-string
+(defn now->timestamp-string
   "Using the java native libraries, using the system clock, create a UTC based iso8601 timestamp"
-  []
+  ^String  []
   (ZonedDateTime->timestamp-string (ZonedDateTime/now ZoneOffset/UTC)))
 
-(defn ^ZonedDateTime timestamp-string->ZonedDateTime
+(defn timestamp-string->ZonedDateTime
   "Given an iso8601 timestamp with offset, convert it into a java.time.ZonedDateTime.
   Throws DateTimeParseException if string can't be parsed"
-  [^String timestamp]
+  ^ZonedDateTime [^String timestamp]
   (ZonedDateTime/from (.parse DateTimeFormatter/ISO_OFFSET_DATE_TIME timestamp)))
 
-(defn ^ZonedDateTime ZonedDateTime->utc-ZonedDateTime
+(defn ZonedDateTime->utc-ZonedDateTime
   "given a zoned date time, convert it to the utc timezone"
-  [^ZonedDateTime zdt]
+  ^ZonedDateTime [^ZonedDateTime zdt]
   (.withZoneSameInstant zdt (ZoneId/of "UTC")))
-
 
 (defn is-only-number?
   "Given a string, does the string only consist of numeric characters (0 through 9)"
@@ -1214,6 +1213,7 @@ to be a zipper."
   "Given a string, does it start with zero?"
   [a]
   (some? (re-find #"^0" a)))
+
 (defn compare-versions
   "Similar in concept to clojure's `compare` but for version strings.  Based on puppet's versioncmp function
   https://github.com/puppetlabs/puppet/blob/9ab8526d0bc5f0fe4e29e7dac9832307d8af2e48/lib/puppet/util/package.rb#L3 but does
@@ -1260,9 +1260,9 @@ to be a zipper."
             (and (is-only-number? current-a) (is-only-number? current-b))
             (if (or (starts-with-zero? current-a)
                     (starts-with-zero? current-b))
-              (compare (.toUpperCase current-a) (.toUpperCase current-b))
+              (compare (.toUpperCase ^String current-a) (.toUpperCase ^String current-b))
               (compare (parse-int current-a) (parse-int current-b)))
 
             :else
-            (compare (.toUpperCase current-a) (.toUpperCase current-b)))))
+            (compare (.toUpperCase ^String current-a) (.toUpperCase ^String current-b)))))
       (compare a b))))
