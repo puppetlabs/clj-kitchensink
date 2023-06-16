@@ -12,6 +12,7 @@
             [clojure.java.io :as io]
             [clojure.pprint :as pprint]
             [clojure.set :as set]
+            [clojure.spec.alpha :as s]
             [clojure.string :as string]
             [clojure.tools.cli :as cli]
             [clojure.tools.logging :as log]
@@ -1202,3 +1203,66 @@ to be a zipper."
   "given a zoned date time, convert it to the utc timezone"
   [^ZonedDateTime zdt]
   (.withZoneSameInstant zdt (ZoneId/of "UTC")))
+
+
+(defn is-only-number?
+  "Given a string, does the string only consist of numeric characters (0 through 9)"
+  [a]
+  (some? (re-find #"^\d+$" a)))
+
+(defn starts-with-zero?
+  "Given a string, does it start with zero?"
+  [a]
+  (some? (re-find #"^0" a)))
+(defn compare-versions
+  "Similar in concept to clojure's `compare` but for version strings.  Based on puppet's versioncmp function
+  https://github.com/puppetlabs/puppet/blob/9ab8526d0bc5f0fe4e29e7dac9832307d8af2e48/lib/puppet/util/package.rb#L3 but does
+  not ignore trailing zeros.
+
+  Given two version strings, do a logical comparison of the two.  If the first is an earlier version that the second,
+  return a positive number.  If they are equivalent versions, return 0, if the first is newer than the second, return a
+  negative number."
+  [a b]
+  (let [version-regular-expression #"[\-.]|\d+|[^\-.\d]+"
+        a-matches (re-seq version-regular-expression a)
+        b-matches (re-seq version-regular-expression b)]
+    (if (and (pos? (count a-matches))
+             (pos? (count b-matches)))
+      (loop [current-a-matches a-matches
+             current-b-matches b-matches]
+        (let [current-a (first current-a-matches)
+              current-b (first current-b-matches)]
+          (cond
+            (and (nil? current-a) (nil? current-b))
+            0
+
+            (nil? current-a)
+            (compare a b)
+
+            (nil? current-b)
+            (compare a b)
+
+            (= current-a current-b)
+            (recur (rest current-a-matches) (rest current-b-matches))
+
+            (= "-" current-a)
+            -1
+
+            (= "-" current-b)
+            1
+
+            (= "." current-a)
+            -1
+
+            (= "." current-b)
+            1
+
+            (and (is-only-number? current-a) (is-only-number? current-b))
+            (if (or (starts-with-zero? current-a)
+                    (starts-with-zero? current-b))
+              (compare (.toUpperCase current-a) (.toUpperCase current-b))
+              (compare (parse-int current-a) (parse-int current-b)))
+
+            :else
+            (compare (.toUpperCase current-a) (.toUpperCase current-b)))))
+      (compare a b))))
