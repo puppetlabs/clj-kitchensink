@@ -36,6 +36,7 @@
 
   ;; this plugin is used by jenkins jobs to interrogate the project version
   :plugins [[lein-project-version "0.1.0"]
+            [jonase/eastwood "1.2.2" :exclusions [org.clojure/clojure]]
             [lein-parent "0.3.7"]]
 
   :test-selectors {:default (complement :slow)

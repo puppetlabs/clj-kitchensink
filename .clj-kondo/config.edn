@@ -1,0 +1,2 @@
+{:linters {:refer-all {:exclude [clojure.test slingshot.test]}}
+ :output {:linter-name true}}
