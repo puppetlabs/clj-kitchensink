@@ -1001,3 +1001,10 @@
     (is (pos? (core/compare-versions "2.0" "1.1.a")))
     (is (neg? (core/compare-versions "2.4" "2.4b")))
     (is (pos? (core/compare-versions "2.4b" "2.4a")))))
+
+(deftest get-lein-project-version-test
+  (testing "unknown project returns nil"
+    (is (nil? (core/get-lein-project-version "unknown"))))
+  (testing "known project returns something"
+    (is (string? (core/get-lein-project-version "kitchensink")))
+    (is (not (string/blank? (core/get-lein-project-version "kitchensink"))))))

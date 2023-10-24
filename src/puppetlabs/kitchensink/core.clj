@@ -1060,6 +1060,11 @@ to be a zipper."
   "Returns a string of the currently running java version"
   (System/getProperty "java.version"))
 
+(defn get-lein-project-version
+  "Get the version of the specified leinigen project from the runtime."
+  [project]
+  (System/getProperty (format "%s.version" project)))
+
 ;; control flow
 
 (defmacro cond-let
