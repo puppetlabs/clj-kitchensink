@@ -42,7 +42,8 @@
   :eastwood {:ignored-faults {:unused-ret-vals {puppetlabs.kitchensink.classpath [{:line 93}]}
                               :deprecations {puppetlabs.kitchensink.classpath [{:line 66}
                                                                                {:line 91}]
-                                             puppetlabs.kitchensink.core [{:line 941}]}
+                                             puppetlabs.kitchensink.core true
+                                             puppetlabs.kitchensink.core-test true}
                               :reflection {puppetlabs.kitchensink.file [{:line 62}]
                                            puppetlabs.kitchensink.core [{:line 929}]}
                               :constant-test {puppetlabs.kitchensink.core-test [{:line 726}

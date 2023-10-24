@@ -1,2 +1,3 @@
-{:linters {:refer-all {:exclude [clojure.test slingshot.test]}}
+{:linters {:refer-all {:exclude [clojure.test slingshot.test]}
+           :deprecated-var {:exclude {puppetlabs.kitchensink.core/cn-for-dn {:namespaces [puppetlabs.kitchensink.core puppetlabs.kitchensink.core-test]}}}}
  :output {:linter-name true}}
