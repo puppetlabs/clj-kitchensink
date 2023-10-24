@@ -938,7 +938,7 @@ to be a zipper."
   If no CN exists in the certificate DN, nil is returned."
   [^java.security.cert.X509Certificate cert]
   (-> cert
-    (.getSubjectDN)
+    (.getSubjectX500Principal)
     (.getName)
     (cn-for-dn)))
 
