@@ -1,6 +1,9 @@
 ## unreleased
+* change use of java.security.cert.X509Certificate/getSubjectDN, which is now deprecated, to java.security.cert.X509Certificate/getSubjectX500Principal
+* add function `get-lein-project-version` to retrieve a given project version from the standard `lein` system properties.
+* mark deprecated interfaces with metadata deprecation
 
-# 3.2.3
+## 3.2.3
 * add clj-kondo linting, eastwood linting, and PR testing
 * address issues identified by clj-kondo, and eastwood
 * add function equivalent of puppet's versioncmp function, and helper functions for to determine if strings have all numeric characters and if strings start with a leading zero.

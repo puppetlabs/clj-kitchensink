@@ -900,8 +900,8 @@ to be a zipper."
 ;; These functions are only used by PuppetDB and they should likely move back into that
 ;; project until they can be refactored away over functions from the jvm-ca library.
 
-(defn cn-for-dn
-  "Deprecated. Use functions from `jvm-certificate-authority`.
+(defn ^:deprecated cn-for-dn
+  "Deprecated. Use functions from https://github.com/puppetlabs/jvm-ssl-utils instead.
 
   Extracts the CN (common name) from an LDAP DN (distinguished name).
 
@@ -929,8 +929,8 @@ to be a zipper."
     (.getValue)
     (str)))
 
-(defn cn-for-cert
-  "Deprecated. Use functions from `jvm-certificate-authority`.
+(defn ^:deprecated cn-for-cert
+  "Deprecated. Use functions from https://github.com/puppetlabs/jvm-ssl-utils instead.
 
   Extract the CN from the DN of an x509 certificate. See `cn-for-dn` for details
   on how extraction is performed.
@@ -938,7 +938,7 @@ to be a zipper."
   If no CN exists in the certificate DN, nil is returned."
   [^java.security.cert.X509Certificate cert]
   (-> cert
-    (.getSubjectDN)
+    (.getSubjectX500Principal)
     (.getName)
     (cn-for-dn)))
 
@@ -1059,6 +1059,11 @@ to be a zipper."
 (def java-version
   "Returns a string of the currently running java version"
   (System/getProperty "java.version"))
+
+(defn get-lein-project-version
+  "Get the version of the specified leinigen project from the runtime."
+  [project]
+  (System/getProperty (format "%s.version" project)))
 
 ;; control flow
 
