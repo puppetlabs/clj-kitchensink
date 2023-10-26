@@ -1,8 +1,9 @@
 (ns puppetlabs.kitchensink.file-test
-  (:require [clojure.test :refer :all]
+  (:require [clojure.java.io :as io]
+            [clojure.test :refer :all]
             [me.raynes.fs :as fs]
-            [puppetlabs.kitchensink.file :refer [atomic-write get-perms set-perms]])
-  (:import (java.io BufferedWriter File)))
+            [puppetlabs.kitchensink.file :refer [atomic-write get-perms set-perms unzip-file]])
+  (:import (java.io BufferedWriter File FileNotFoundException)))
 
 (deftest atomic-write-test
   (testing "when the file doesn't exist"
@@ -58,3 +59,21 @@
       (atomic-write tmp-file write-fn)
 
       (fs/delete tmp-file))))
+
+(deftest unzip-file-test
+  (testing "can unzip known .gz file"
+    (let [tmp-file (.toString ^File (fs/temp-file "unzipped-file"))]
+      (unzip-file "dev-resources/fixtures/plain-text.txt.gz" tmp-file)
+      (is (= (slurp tmp-file) (slurp "dev-resources/fixtures/plain-text.txt")))))
+  (testing "creates missing directories"
+    (let [tmp-file (str (.toString ^File (fs/temp-dir "test-directory")) "/foo/bar/baz/thing.txt")]
+      (unzip-file "dev-resources/fixtures/plain-text.txt.gz" tmp-file)
+      (is (= (slurp tmp-file) (slurp "dev-resources/fixtures/plain-text.txt")))))
+  (testing "throws if file does not exist"
+    (let [tmp-file (.toString ^File (fs/temp-file "not-unzipped-file"))]
+      (is (thrown? FileNotFoundException (unzip-file "something" tmp-file)))))
+  (testing "refuses to overwrite input file"
+    (let [tmp-file (.toString ^File (fs/temp-file "copy-of-file"))]
+      (io/copy (io/file "dev-resources/fixtures/plain-text.txt.gz") (io/file tmp-file))
+      (unzip-file tmp-file tmp-file)
+      (is (= (slurp "dev-resources/fixtures/plain-text.txt.gz") (slurp tmp-file))))))

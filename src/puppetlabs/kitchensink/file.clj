@@ -1,7 +1,9 @@
 (ns puppetlabs.kitchensink.file
+  (:require [clojure.java.io :as io])
   (:import (java.io BufferedWriter FileOutputStream OutputStreamWriter)
            (java.nio.file CopyOption Files LinkOption Path Paths StandardCopyOption)
-           (java.nio.file.attribute FileAttribute PosixFilePermissions)))
+           (java.nio.file.attribute FileAttribute PosixFilePermissions)
+           (java.util.zip GZIPInputStream)))
 
 (defn str->path
   ^Path [path]
@@ -82,3 +84,16 @@
    (atomic-write-string path string nil))
   ([path string permissions]
    (atomic-write path #(.write ^BufferedWriter % ^String string) permissions)))
+
+(defn unzip-file
+  "Given a path to an input file, and a path to an output location, attempt to unzip the file.
+  Will not overwrite the same path with the output"
+  [input-file output-file]
+  (when (not= input-file output-file)
+    (io/make-parents output-file)
+    (with-open [file-input-stream (io/input-stream input-file)
+                gzip-input-stream (GZIPInputStream. file-input-stream)
+                file-output-stream (io/output-stream output-file)]
+      (io/copy gzip-input-stream file-output-stream))))
+
+      

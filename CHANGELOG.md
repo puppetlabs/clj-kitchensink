@@ -2,6 +2,7 @@
 * change use of java.security.cert.X509Certificate/getSubjectDN, which is now deprecated, to java.security.cert.X509Certificate/getSubjectX500Principal
 * add function `get-lein-project-version` to retrieve a given project version from the standard `lein` system properties.
 * mark deprecated interfaces with metadata deprecation
+* add 'unzip-file' routine to the files namespace to decompress zipped files
 
 ## 3.2.3
 * add clj-kondo linting, eastwood linting, and PR testing
