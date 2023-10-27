@@ -4,6 +4,7 @@
 * mark deprecated interfaces with metadata deprecation
 * add 'unzip-file' routine to the files namespace to decompress zipped files
 * add 'untar-file' routine to the files namespace to decompress tar files
+* update clj-parent to 5.6.6
 
 ## 3.2.3
 * add clj-kondo linting, eastwood linting, and PR testing
