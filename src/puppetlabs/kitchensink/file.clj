@@ -66,10 +66,12 @@
                          default-permissions))
          temp-attributes (into-array FileAttribute [(perms->attribute "rw-------")])
          temp-file (Files/createTempFile dir (.toString (.getFileName target)) "tmp" temp-attributes)
-         stream (proxy [FileOutputStream] [(.toString temp-file)]
-                  (close []
-                    (.sync (.getFD ^FileOutputStream this))
-                    (proxy-super close)))
+         stream  (proxy [FileOutputStream] [(.toString temp-file)]
+                   (close []
+                     (.sync (.getFD ^FileOutputStream this))
+                     ;; this looks weird, but makes the proxy-super avoid reflection by masking `this` with a version that has the meta tag
+                     (let [^FileOutputStream this this]
+                       (proxy-super close))))
          writer (BufferedWriter. (OutputStreamWriter. stream))]
 
      (write-function writer)
