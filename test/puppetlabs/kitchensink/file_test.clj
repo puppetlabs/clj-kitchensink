@@ -1,8 +1,9 @@
 (ns puppetlabs.kitchensink.file-test
   (:require [clojure.java.io :as io]
+            [clojure.pprint]
             [clojure.test :refer :all]
             [me.raynes.fs :as fs]
-            [puppetlabs.kitchensink.file :refer [atomic-write get-perms set-perms unzip-file]])
+            [puppetlabs.kitchensink.file :refer [atomic-write get-perms set-perms unzip-file untar-file]])
   (:import (java.io BufferedWriter File FileNotFoundException)))
 
 (deftest atomic-write-test
@@ -77,3 +78,37 @@
       (io/copy (io/file "dev-resources/fixtures/plain-text.txt.gz") (io/file tmp-file))
       (unzip-file tmp-file tmp-file)
       (is (= (slurp "dev-resources/fixtures/plain-text.txt.gz") (slurp tmp-file))))))
+
+(def large-file-line-content
+  "abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789abcdefghijklmnopqrstuvwxyz0123456789")
+(deftest untar-file-test
+  (testing "can untar known tar file"
+    (let [temp-dir (.toString ^File (fs/temp-dir "test-tar-directory"))
+          temp-dir-length (count temp-dir)]
+      (untar-file "dev-resources/fixtures/tar-contents.tar" temp-dir)
+      ;; extract the paths, remove the temp-dir front, and sort the result so the results are predictable
+      (let [names (sort (map #(subs (str %) temp-dir-length) (file-seq (io/file temp-dir))))]
+        (is (= [""
+                "/tar-contents"
+                "/tar-contents/bar"
+                "/tar-contents/bar/1"
+                "/tar-contents/bar/1/largetextfile.txt"
+                "/tar-contents/bar/2"
+                "/tar-contents/bar/3"
+                "/tar-contents/bar/4"
+                "/tar-contents/bar/4/hello.txt"
+                "/tar-contents/foo"
+                "/tar-contents/foo/foo"
+                "/tar-contents/foo/hi.txt"]
+               names))
+        (is (= "this is a greeting.\n" (slurp (str temp-dir "/tar-contents/bar/4/hello.txt"))))
+        (is (= "This is a warm greeting.\n" (slurp (str temp-dir "/tar-contents/foo/hi.txt"))))
+        (testing "large files are correctly processed"
+          (let [counter (atom 0)]
+            (with-open [rdr (io/reader (str temp-dir "/tar-contents/bar/1/largetextfile.txt"))]
+              (doseq [line (line-seq rdr)]
+                (swap! counter inc)
+                ;; each line should be identical
+                (is (= large-file-line-content line))))
+            ;; there should be 90 lines in the file.
+            (is (= 90 @counter))))))))

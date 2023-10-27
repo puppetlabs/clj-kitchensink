@@ -17,6 +17,7 @@
                  [org.clojure/tools.logging]
                  [org.clojure/tools.cli]
 
+                 [org.apache.commons/commons-compress]
                  [clj-time]
                  [clj-commons/fs]
                  [slingshot]

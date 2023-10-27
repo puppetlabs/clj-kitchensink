@@ -3,6 +3,7 @@
 * add function `get-lein-project-version` to retrieve a given project version from the standard `lein` system properties.
 * mark deprecated interfaces with metadata deprecation
 * add 'unzip-file' routine to the files namespace to decompress zipped files
+* add 'untar-file' routine to the files namespace to decompress tar files
 
 ## 3.2.3
 * add clj-kondo linting, eastwood linting, and PR testing
