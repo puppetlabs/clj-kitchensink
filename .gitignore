@@ -6,3 +6,4 @@ pom.xml
 .lein-deps-sum
 .lein-failures
 .clj-kondo/.cache/
+.eastwood
