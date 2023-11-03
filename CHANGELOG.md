@@ -6,7 +6,8 @@
 * add 'untar-file' routine to the files namespace to decompress tar files
 * update clj-parent to 5.6.6
 * remove reflection use in atomic-write
-
+* add function `delete-recursively` to the files namespace to recursively delete a directory
+* 
 ## 3.2.3
 * add clj-kondo linting, eastwood linting, and PR testing
 * address issues identified by clj-kondo, and eastwood

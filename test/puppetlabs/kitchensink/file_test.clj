@@ -3,8 +3,10 @@
             [clojure.pprint]
             [clojure.test :refer :all]
             [me.raynes.fs :as fs]
-            [puppetlabs.kitchensink.file :refer [atomic-write get-perms set-perms unzip-file untar-file]])
-  (:import (java.io BufferedWriter File FileNotFoundException)))
+            [puppetlabs.kitchensink.file :refer [atomic-write get-perms set-perms unzip-file untar-file delete-recursively]])
+  (:import (java.io BufferedWriter File FileNotFoundException)
+           (java.nio.file Files Path)
+           (java.nio.file.attribute FileAttribute)))
 
 (deftest atomic-write-test
   (testing "when the file doesn't exist"
@@ -112,3 +114,27 @@
                 (is (= large-file-line-content line))))
             ;; there should be 90 lines in the file.
             (is (= 90 @counter))))))))
+
+
+(defn recursively-fill-directory
+  [^Path directory depth max-depth]
+  (when (< depth max-depth)
+    (let [num-files (rand-int 5)
+          num-dirs (rand-int 5)]
+      (dotimes [n num-files]
+        (Files/createTempFile directory (str "file-" depth "-" n "-") ".tmp" (into-array FileAttribute [])))
+      (dotimes [n num-dirs]
+        (let [new-dir (Files/createTempDirectory directory (str "directory-" depth "-" n "-") (into-array FileAttribute []))]
+          (recursively-fill-directory new-dir (inc depth) max-depth))))))
+(deftest delete-recursively-test
+  (testing "can delete a single file"
+    (let [tmp-file (Files/createTempFile "prefix-" ".tmp" (into-array FileAttribute []))]
+      (is (.exists (.toFile tmp-file)))
+      (is (delete-recursively (.getAbsolutePath (.toFile tmp-file))))
+      (is (not (.exists (.toFile tmp-file))))))
+  (testing "can delete a tree with files and directories"
+    (let [tmp-dir (Files/createTempDirectory "testing" (into-array FileAttribute []))]
+      (recursively-fill-directory tmp-dir 0 10)
+      (is (.exists (.toFile tmp-dir)))
+      (is (delete-recursively (.getAbsolutePath (.toFile tmp-dir))))
+      (is (not (.exists (.toFile tmp-dir)))))))

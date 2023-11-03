@@ -1,7 +1,8 @@
 (ns puppetlabs.kitchensink.file
   (:require [clojure.java.io :as io]
-            [clojure.string :as str])
-  (:import (java.io BufferedWriter FileOutputStream OutputStreamWriter)
+            [clojure.string :as str]
+            [clojure.tools.logging :as log])
+  (:import (java.io BufferedWriter File FileOutputStream OutputStreamWriter)
            (java.nio ByteBuffer)
            (java.nio.channels Channels)
            (java.nio.file CopyOption Files LinkOption Path Paths StandardCopyOption)
@@ -138,3 +139,30 @@
               (io/make-parents output-file)
               (write-tar-stream-to-file tar-input-stream output-file buffer)))
           (recur (.getNextTarEntry tar-input-stream)))))))
+
+(defn delete-recursively
+  "Given a path to a directory, delete everything in the directory recursively.
+  Given a path to a file, it will delete that file.
+  Returns true if successful, false if not. Failures are logged at the info level.
+  Uses a `stack` based tail recursion method to avoid using a recursive stack"
+  [^String path-to-delete]
+  (let [path (str->path path-to-delete)
+        first (.toFile path)]
+    (loop [stack [first]]
+      (if (seq stack)
+        (let [^File last-element (last stack)]
+          (if (.isDirectory last-element)
+             (let [files (.listFiles ^File last-element)]
+               ;; if it is empty, we can delete it
+                (if (empty? files)
+                  (if (.delete last-element)
+                    (recur (butlast stack))
+                    (do (log/infof "Failed to delete (%s), aborting delete of (%s)" (.getCanonicalPath last-element) (.getCanonicalPath first))
+                        false))
+                  ;; it isn't empty, so push all the contents to the stack and recurse
+                  (recur (concat stack files))))
+             (if (.delete last-element)
+                 (recur (butlast stack))
+                 (do (log/infof "Failed to delete (%s), aborting delete of (%s)" (.getCanonicalPath last-element) (.getCanonicalPath first))
+                     false))))
+        true))))
