@@ -1,4 +1,6 @@
 ## unreleased
+
+## 3.2.4
 * change use of java.security.cert.X509Certificate/getSubjectDN, which is now deprecated, to java.security.cert.X509Certificate/getSubjectX500Principal
 * add function `get-lein-project-version` to retrieve a given project version from the standard `lein` system properties.
 * mark deprecated interfaces with metadata deprecation
