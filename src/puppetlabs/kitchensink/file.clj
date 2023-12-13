@@ -72,12 +72,10 @@
                      (.sync (.getFD ^FileOutputStream this))
                      ;; this looks weird, but makes the proxy-super avoid reflection by masking `this` with a version that has the meta tag
                      (let [^FileOutputStream this this]
-                       (proxy-super close))))
-         writer (BufferedWriter. (OutputStreamWriter. stream))]
+                       (proxy-super close))))]
 
-     (write-function writer)
-
-     (.close writer)
+     (with-open [writer (BufferedWriter. (OutputStreamWriter. stream))]
+       (write-function writer))
 
      (when owner
        (Files/setOwner temp-file owner))
