@@ -907,6 +907,11 @@ to be a zipper."
 ;; These functions are only used by PuppetDB and they should likely move back into that
 ;; project until they can be refactored away over functions from the jvm-ca library.
 
+(defn- safe-value-request
+  "Used to make eastwood happy about the type"
+  [^Rdn v]
+  (.getValue v))
+
 (defn ^:deprecated cn-for-dn
   "Deprecated. Use functions from https://github.com/puppetlabs/jvm-ssl-utils instead.
 
@@ -929,12 +934,12 @@ to be a zipper."
   [^String dn]
   {:pre [(string? dn)]}
   (some->> dn
-    (LdapName.)
-    (.getRdns)
-    (filter #(= "CN" (.getType ^Rdn %)))
-    (first)
-    (.getValue)
-    (str)))
+           (LdapName.)
+           (.getRdns)
+           (filter #(= "CN" (.getType ^Rdn %)))
+           (first)
+           (safe-value-request)
+           (str)))
 
 (defn ^:deprecated cn-for-cert
   "Deprecated. Use functions from https://github.com/puppetlabs/jvm-ssl-utils instead.
