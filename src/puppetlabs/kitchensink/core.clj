@@ -226,6 +226,13 @@ to be a zipper."
     (catch NumberFormatException _e
       nil)))
 
+(defn safe-parse-int
+  "Accept strings or integers. If string, parse to an integer, otherwise return the integer"
+  [s]
+  (if (integer? s)
+    s
+    (parse-int s)))
+
 (defn parse-float
   "Parse a string `s` as a float, returning nil if the string doesn't
   contain a float"

@@ -1008,3 +1008,12 @@
   (testing "known project returns something"
     (is (string? (core/get-lein-project-version "kitchensink")))
     (is (not (string/blank? (core/get-lein-project-version "kitchensink"))))))
+
+(deftest safe-parse-int-test
+  (testing "Converts appropriately"
+    (are [x y] (= x (core/safe-parse-int y))
+               0 0
+               1 1
+               0 "0"
+               1 "1"
+               nil "notanumber")))
