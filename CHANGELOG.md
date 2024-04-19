@@ -1,5 +1,10 @@
 ## unreleased
 
+## 3.3.0
+* add new functions `duration-str->seconds` and `duration-str->Duration` to calculate duration values in the style of Puppet duration settings resulting in an integer and a java.time.Duration respectively
+* add new function `safe-parse-int` to convert a number or string representing a to a number
+* update clj-parent to 5.6.14
+
 ## 3.2.5
 * in `atomic-write` ensure the writer is closed if the `write-function` throws an exception.
 

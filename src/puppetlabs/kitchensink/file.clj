@@ -129,14 +129,14 @@
         ;; allocate the copy buffer once and reuse for efficiency.
         buffer (ByteBuffer/allocateDirect (* 64 1024))]
     (with-open [tar-input-stream (TarArchiveInputStream. (io/input-stream path-to-tar-file))]
-      (loop [entry (.getNextTarEntry tar-input-stream)]
+      (loop [entry (.getNextEntry tar-input-stream)]
         (when (some? entry)
           (if (.isDirectory entry)
             (Files/createDirectories (dir+file->path trimmed-output (.getName entry)) empty-file-attributes)
             (let [output-file (dir+file->path trimmed-output (.getName entry))]
               (io/make-parents output-file)
               (write-tar-stream-to-file tar-input-stream output-file buffer)))
-          (recur (.getNextTarEntry tar-input-stream)))))))
+          (recur (.getNextEntry tar-input-stream)))))))
 
 (defn delete-recursively
   "Given a path to a directory, delete everything in the directory recursively.
