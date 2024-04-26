@@ -1,5 +1,8 @@
 ## unreleased
 
+## 3.3.1
+* add new functions for conversion of milliseconds to seconds, minutes, hours and days, along with a set of logical corresponding matrix of those units
+
 ## 3.3.0
 * add new functions `duration-str->seconds` and `duration-str->Duration` to calculate duration values in the style of Puppet duration settings resulting in an integer and a java.time.Duration respectively
 * add new function `safe-parse-int` to convert a number or string representing a to a number
