@@ -26,3 +26,85 @@
   "Given a puppet duration string, return a java.time.Duration equivalent"
   ^Duration [duration]
   (Duration/ofSeconds (duration-str->seconds duration)))
+
+(defn days->hours
+  "Convert a number of days into equivalent hours"
+  [days]
+  (* 24 days))
+
+(defn hours->days
+  "Convert a number of hours into days and fractional days"
+  [hours]
+  (/ hours 24))
+
+(defn hours->min
+  "Convert a number of hours into minutes"
+  [hours]
+  (* 60 hours))
+
+(defn min->hours
+  "Convert a number of minutes into hours and fractional hours"
+  [min]
+  (/ min 60))
+
+(defn min->sec
+  "Convert a number of minutes into seconds"
+  [min]
+  (* 60 min))
+
+(defn sec->min
+  "Convert a number of seconds into minutes and fractional minutes"
+  [sec]
+  (/ sec 60))
+
+(defn sec->ms
+  "Convert a number of seconds into milliseconds"
+  [sec]
+  (* 1000 sec))
+
+(defn ms->sec
+  "Convert a number of milliseconds into seconds and fractional seconds"
+  [ms]
+  (/ ms 1000))
+
+(defn min->ms
+  "Convert a number of minutes into milliseconds"
+  [min]
+  (-> min
+      min->sec
+      sec->ms))
+
+(defn ms->min
+  "Convert a number of milliseconds into minutes and fractional minutes"
+  [ms]
+  (-> ms
+      ms->sec
+      sec->min))
+
+(defn hours->ms
+  "Convert a number of hours into milliseconds"
+  [hours]
+  (-> hours
+      hours->min
+      min->ms))
+
+(defn ms->hours
+  "Convert a number of milliseconds into hours and fractional hours"
+  [ms]
+  (-> ms
+      ms->min
+      min->hours))
+
+(defn days->ms
+  "Convert a number of days into milliseconds"
+  [days]
+  (-> days
+      days->hours
+      hours->ms))
+
+(defn ms->days
+  "Convert a number of milliseconds into days and fractional days"
+  [ms]
+  (-> ms
+      ms->hours
+      hours->days))
