@@ -10,13 +10,16 @@
 
   This namespace when 'required' will also setup some common JSON encoders
   globally, so you can avoid doing this for each call."
-  (:require [cheshire.core :as core]
-            [cheshire.generate :as generate]
-            [clj-time.coerce :as coerce]
-            [clj-time.core :as clj-time]
-            [clojure.java.io :as io]
-            [clojure.tools.logging :as log])
-  (:import com.fasterxml.jackson.core.JsonGenerator))
+  (:require
+    [cheshire.core :as core]
+    [cheshire.generate :as generate]
+    [clj-time.coerce :as coerce]
+    [clj-time.core :as clj-time]
+    [clojure.java.io :as io]
+    [clojure.tools.logging :as log])
+  (:import
+    com.fasterxml.jackson.core.JsonGenerator
+    (java.time Instant LocalDate LocalDateTime)))
 
 (defn- clj-time-encoder
   [data jsonGenerator]
@@ -24,15 +27,51 @@
 
 (def ^:dynamic *datetime-encoder* clj-time-encoder)
 
+(defn- java-instant-encoder
+  [^Instant data jsonGenerator]
+  (.writeString ^JsonGenerator jsonGenerator ^String (.toString data)))
+
+(def ^:dynamic *instant-encoder* java-instant-encoder)
+
+(defn- java-localdate-encoder
+  [^LocalDate data jsonGenerator]
+  (.writeString ^JsonGenerator jsonGenerator ^String (.toString data)))
+
+(def ^:dynamic *localdate-encoder* java-localdate-encoder)
+
+(defn- java-localdatetime-encoder
+  [^LocalDateTime data jsonGenerator]
+  (.writeString ^JsonGenerator jsonGenerator ^String (.toString data)))
+
+(def ^:dynamic *localdatetime-encoder* java-localdatetime-encoder)
+
 (defn add-common-json-encoders!*
   "Non-memoize version of add-common-json-encoders!"
   []
   (when (satisfies? generate/JSONable (clj-time/date-time 1999))
     (log/warn "Overriding existing JSONable protocol implementation for org.joda.time.DateTime"))
+  (when (satisfies? generate/JSONable (Instant/now))
+    (log/warn "Overriding existing JSONable protocol implementation for java.time.Instant"))
+  (when (satisfies? generate/JSONable (LocalDateTime/now))
+    (log/warn "Overriding existing JSONable protocol implementation for java.time.LocalDateTime"))
+  (when (satisfies? generate/JSONable (LocalDate/now))
+    (log/warn "Overriding existing JSONable protocol implementation for java.time.LocalDate"))
   (generate/add-encoder
     org.joda.time.DateTime
     (fn [data jsonGenerator]
-      (*datetime-encoder* data jsonGenerator))))
+      (*datetime-encoder* data jsonGenerator)))
+  (generate/add-encoder
+    java.time.Instant
+    (fn [data jsonGenerator]
+      (*instant-encoder* data jsonGenerator)))
+  (generate/add-encoder
+    java.time.LocalDate
+    (fn [data jsonGenerator]
+      (*localdate-encoder* data jsonGenerator)))
+  (generate/add-encoder
+    java.time.LocalDateTime
+    (fn [data jsonGenerator]
+      (*localdatetime-encoder* data jsonGenerator))))
 
 (def
   ^{:doc "Registers some common encoders for cheshire JSON encoding.
